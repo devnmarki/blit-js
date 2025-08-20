@@ -5,6 +5,7 @@ const clock = new BlitJS.time.Clock();
 const display = new BlitJS.Surface([BlitJS.display.getWidth() / 2, BlitJS.display.getHeight() / 2]);
 
 const blueBox = new BlitJS.Surface([32, 64]);
+const blueBoxRect = blueBox.getRect([16 * 8, 16 * 5]);
 blueBox.fill('blue');
 
 const playerSurf = await BlitJS.image.load("./images/player.png");
@@ -40,8 +41,12 @@ const loop = () => {
         flip = true;    
     if (frameMovement > 0)
         flip = false;
+
+    if (playerRect.colliderect(blueBoxRect)) {
+        console.log("collision is happening!");
+    }
     
-    display.blit(blueBox, [16 * 8, 16 * 5]);
+    display.blit(blueBox, blueBoxRect.pos);
     display.blit(BlitJS.transform.flip(playerSurf, [flip, false]), playerRect.pos);
     
     screen.blit(BlitJS.transform.scale(display, BlitJS.display.getSize()), [0, 0]);

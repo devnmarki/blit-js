@@ -20,6 +20,14 @@ export namespace BlitJS {
             this._h = size[1];
         }
 
+        copy(): Rect {
+            return new Rect([this._x, this._y], [this._w, this._h]);
+        }
+
+        colliderect(other: Rect): boolean {
+            return !(this.left > other.right || this.right < other.left || this.bottom < other.top || this.top > other.bottom)
+        }
+
         get width() { return this._w; }
         set width(value: number) { this._w = value; }
 
