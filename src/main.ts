@@ -45,6 +45,11 @@ const loop = () => {
     if (playerRect.colliderect(blueBoxRect)) {
         console.log("collision is happening!");
     }
+
+    let mpos: [number, number] = [BlitJS.mouse.getPos()[0] / 2, BlitJS.mouse.getPos()[1] / 2];
+    if (blueBoxRect.collidepoint(mpos)) {
+        console.log("point collision is happening!");
+    }
     
     display.blit(blueBox, blueBoxRect.pos);
     display.blit(BlitJS.transform.flip(playerSurf, [flip, false]), playerRect.pos);

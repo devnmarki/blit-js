@@ -28,6 +28,10 @@ export namespace BlitJS {
             return !(this.left > other.right || this.right < other.left || this.bottom < other.top || this.top > other.bottom)
         }
 
+        collidepoint(point: [number, number]) {
+            return point[0] >= this.left && point[0] <= this.right && point[1] >= this.top && point[1] <= this.bottom;
+        }
+
         get width() { return this._w; }
         set width(value: number) { this._w = value; }
 
@@ -229,6 +233,25 @@ export namespace BlitJS {
             getFPS(): number {
                 return this._fps;
             }
+        }
+    }
+
+    export namespace mouse {
+        
+        let _pos: [number, number] = [0, 0];
+        
+        const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+        canvas.addEventListener("mousemove", (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+
+            _pos[0] = (e.clientX - rect.left) * scaleX;
+            _pos[1] = (e.clientY - rect.top) * scaleY;
+        });
+        
+        export const getPos = (): [number, number] => {
+            return [..._pos];
         }
     }
 
