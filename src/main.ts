@@ -4,14 +4,12 @@ const screen = BlitJS.display.setMode([1280, 720]);
 const clock = new BlitJS.time.Clock();
 const display = new BlitJS.Surface([BlitJS.display.getWidth() / 2, BlitJS.display.getHeight() / 2]);
 
-const blueBox = new BlitJS.Surface([32, 32]);
+const blueBox = new BlitJS.Surface([32, 64]);
 blueBox.fill('blue');
 
 const playerSurf = await BlitJS.image.load("./images/player.png");
+const playerRect = playerSurf.getRect([200, 100]);
 
-const rect = new BlitJS.Rect([200, 200], [50, 50]);
-
-let x: number = 50;
 let movement = [false, false];
 let flip: boolean = false;
 
@@ -36,15 +34,15 @@ const loop = () => {
     }
 
     let frameMovement: number = (Number(movement[1]) - Number(movement[0]));
-    x += frameMovement * 3;
+    playerRect.left += frameMovement * 3;
 
     if (frameMovement < 0)
         flip = true;    
     if (frameMovement > 0)
         flip = false;
     
-    display.blit(blueBox, [16 * 8, 16 * 10]);
-    display.blit(BlitJS.transform.flip(playerSurf, [flip, false]), [x, 16 * 13]);
+    display.blit(blueBox, [16 * 8, 16 * 5]);
+    display.blit(BlitJS.transform.flip(playerSurf, [flip, false]), playerRect.pos);
     
     screen.blit(BlitJS.transform.scale(display, BlitJS.display.getSize()), [0, 0]);
     

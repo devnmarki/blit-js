@@ -32,6 +32,9 @@ export namespace BlitJS {
         get y() { return this._y; }
         set y(value: number) { this._y = value; }
 
+        get pos(): [number, number] { return [this._x, this._y]; }
+        get size(): [number, number] { return [this._w, this._h]; }
+
         get left() { return this._x; }
         set left(value: number) { this._x = value; }
 
@@ -50,11 +53,14 @@ export namespace BlitJS {
         ctx: CanvasRenderingContext2D = this.canvas.getContext('2d') as CanvasRenderingContext2D;
         size: [number, number];
         image: HTMLImageElement | null = null;
+        
+        private _rect: Rect;
 
         constructor(size: [number, number]) {
             this.size = size;
             this.canvas.width = size[0];
             this.canvas.height = size[1];
+            this._rect = new Rect([0, 0], size);
         }
 
         fill(color: string = "black"): void {
@@ -65,11 +71,21 @@ export namespace BlitJS {
         }
 
         blit(surface: Surface, pos: [number, number]): void {
-            this.ctx.drawImage(surface.canvas, pos[0], pos[1]);
+            this._rect.x = pos[0];
+            this._rect.y = pos[1];
+            this.ctx.drawImage(surface.canvas, this._rect.x, this._rect.y);
         }
 
         copy(): Surface {
             return new Surface(this.size);
+        }
+
+        getRect(pos?: [number, number]) { 
+            if (pos) {
+                this._rect.x = pos[0];
+                this._rect.y = pos[1];
+            }
+            return this._rect;
         }
     }
 
