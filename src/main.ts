@@ -21,15 +21,15 @@ const loop = () => {
 
     for (const e of BlitJS.event.get()) {
         if (e.type == BlitJS.event.EventType.KEYDOWN) {
-            if (e.key == "a")
+            if (e.key == BlitJS.Keys.A)
                 movement[0] = true;
-            if (e.key == "d")
+            if (e.key == BlitJS.Keys.D)
                 movement[1] = true;
         }
         if (e.type == BlitJS.event.EventType.KEYUP) {
-            if (e.key == "a")
+            if (e.key == BlitJS.Keys.A)
                 movement[0] = false;
-            if (e.key == "d")
+            if (e.key == BlitJS.Keys.D)
                 movement[1] = false;
         }
     }
