@@ -53,6 +53,10 @@ const loop = () => {
 
     BlitJS.draw.rect(display, playerRect, { r: 255, g: 0, b: 0 });
     BlitJS.draw.fillCircle(display, [300, 100], 20, { r: 0, g: 0, b: 255, });
+    BlitJS.draw.line(display, [10, 10], [100, 80], { b: 255 });
+    BlitJS.draw.arc(display, [100, 100], 50, 0, Math.PI, { r: 255, g: 0, b: 0, a: 1 }, 2);
+    BlitJS.draw.ellipse(display, [200, 200], [80, 40], 0, 0, 2 * Math.PI, { r: 0, g: 255, b: 0, a: 1 }, 3);
+    BlitJS.draw.fillEllipse(display, [150, 150],[ 60, 30], 0, 0, 2 * Math.PI, { r: 0, g: 0, b: 255, a: 1 });
     
     display.blit(blueBox, blueBoxRect.pos);
     display.blit(BlitJS.transform.flip(playerSurf, [flip, false]), playerRect.pos);

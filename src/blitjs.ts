@@ -183,7 +183,7 @@ export namespace BlitJS {
             surface.ctx.arc(pos[0], pos[1], radius, 0, 2 * Math.PI, false);
             surface.ctx.stroke();
             surface.ctx.restore();
-        };
+        }
 
         export const fillCircle = (
             surface: Surface, 
@@ -197,8 +197,79 @@ export namespace BlitJS {
             surface.ctx.arc(pos[0], pos[1], radius, 0, 2 * Math.PI, false);
             surface.ctx.fill();
             surface.ctx.restore();
+        }
+
+        export const line = (
+            surface: Surface,
+            start: [number, number],
+            end: [number, number],
+            color: Color = { a: 1 },
+            lineWidth: number = 1
+        ) => {
+            surface.ctx.save();
+            surface.ctx.strokeStyle = `rgba(${color.r ?? 0}, ${color.g ?? 0}, ${color.b ?? 0}, ${color.a ?? 1})`;
+            surface.ctx.lineWidth = lineWidth;
+            surface.ctx.beginPath();
+            surface.ctx.moveTo(start[0], start[1]);
+            surface.ctx.lineTo(end[0], end[1]);
+            surface.ctx.stroke();
+            surface.ctx.restore();
         };
 
+        export const arc = (
+            surface: Surface,
+            pos: [number, number],
+            radius: number,
+            startAngle: number,
+            endAngle: number,
+            color: Color = { a: 1 },
+            lineWidth: number = 1
+        ) => {
+            surface.ctx.save();
+            surface.ctx.strokeStyle = `rgba(${color.r ?? 0}, ${color.g ?? 0}, ${color.b ?? 0}, ${color.a ?? 1})`;
+            surface.ctx.lineWidth = lineWidth;
+            surface.ctx.beginPath();
+            surface.ctx.arc(pos[0], pos[1], radius, startAngle, endAngle);
+            surface.ctx.stroke();
+            surface.ctx.restore();
+        };
+
+
+        export const ellipse = (
+            surface: Surface,
+            pos: [number, number],
+            radius: [number, number],
+            rotation: number = 0,
+            startAngle: number = 0,
+            endAngle: number = 2 * Math.PI,
+            color: Color = { a: 1 },
+            lineWidth: number = 1
+        ) => {
+            surface.ctx.save();
+            surface.ctx.strokeStyle = `rgba(${color.r ?? 0}, ${color.g ?? 0}, ${color.b ?? 0}, ${color.a ?? 1})`;
+            surface.ctx.lineWidth = lineWidth;
+            surface.ctx.beginPath();
+            surface.ctx.ellipse(pos[0], pos[1], radius[0], radius[1], rotation, startAngle, endAngle);
+            surface.ctx.stroke();
+            surface.ctx.restore();
+        };
+
+        export const fillEllipse = (
+            surface: Surface,
+            pos: [number, number],
+            radius: [number, number],
+            rotation: number = 0,
+            startAngle: number = 0,
+            endAngle: number = 2 * Math.PI,
+            color: Color = { a: 1 }
+        ) => {
+            surface.ctx.save();
+            surface.ctx.fillStyle = `rgba(${color.r ?? 0}, ${color.g ?? 0}, ${color.b ?? 0}, ${color.a ?? 1})`;
+            surface.ctx.beginPath();
+            surface.ctx.ellipse(pos[0], pos[1], radius[0], radius[1], rotation, startAngle, endAngle);
+            surface.ctx.fill();
+            surface.ctx.restore();
+        };
     }
 
     export namespace display {
@@ -357,7 +428,6 @@ export namespace BlitJS {
         Alt = "Alt", 
         Meta = "Meta",
         CapsLock = "CapsLock",
-
         Enter = "Enter", 
         Space = " ", 
         Backspace = "Backspace", 
@@ -388,6 +458,14 @@ export namespace BlitJS {
         F12 = "F12"
     }
 
+    export enum Buttons {
+        Left,
+        Middle,
+        Right,
+        Back,
+        Forward
+    }
+
     export namespace event {
         export enum EventType {
             KEYDOWN,
@@ -399,7 +477,7 @@ export namespace BlitJS {
         export interface Event {
             type: EventType;
             key?: Keys;
-            button?: number;
+            button?: Buttons;
         }
 
         const eventQueue: Event[] = [];
@@ -415,8 +493,8 @@ export namespace BlitJS {
             pressedKeys.delete(e.key);
             eventQueue.push({ type: EventType.KEYUP, key: e.key as Keys })
         });
-        window.addEventListener("mousedown", (e) => eventQueue.push({ type: EventType.MOUSEDOWN, button: e.button }));
-        window.addEventListener("mouseup", (e) => eventQueue.push({ type: EventType.MOUSEUP, button: e.button }));
+        window.addEventListener("mousedown", (e) => eventQueue.push({ type: EventType.MOUSEDOWN, button: e.button as Buttons }));
+        window.addEventListener("mouseup", (e) => eventQueue.push({ type: EventType.MOUSEUP, button: e.button as Buttons }));
         window.addEventListener("contextmenu", (e) => e.preventDefault());
 
         export const get = () => {
