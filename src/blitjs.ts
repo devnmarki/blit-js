@@ -1,10 +1,10 @@
 export namespace BlitJS {
 
     export type Color = {
-        r: number,
-        g: number,
-        b: number,
-        a: number
+        r?: number,
+        g?: number,
+        b?: number,
+        a?: number
     }
 
     export class Rect {
@@ -140,6 +140,24 @@ export namespace BlitJS {
             flipped.ctx.drawImage(surf.canvas, 0, 0);
 
             return flipped;
+        }
+    }
+
+    export namespace draw {
+
+        export const rect = (surface: Surface, rect: Rect, color: Color = { r: 0, g: 0, b: 0, a: 1 }, lineWidth: number = 1) => {
+            surface.ctx.save();
+            surface.ctx.strokeStyle = `rgba(${color.r ?? 0}, ${color.g ?? 0}, ${color.b ?? 0}, ${color.a ?? 1})`;
+            surface.ctx.lineWidth = lineWidth;
+            surface.ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+            surface.ctx.restore();
+        }
+
+        export const fillRect = (surface: Surface, rect: Rect, color: Color = { r: 0, g: 0, b: 0, a: 1 }) => {
+            surface.ctx.save();
+            surface.ctx.fillStyle = `rgba(${color.r ?? 0}, ${color.g ?? 0}, ${color.b ?? 0}, ${color.a ?? 1})`;
+            surface.ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+            surface.ctx.restore();
         }
     }
 

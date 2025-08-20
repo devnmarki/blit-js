@@ -50,6 +50,8 @@ const loop = () => {
     if (blueBoxRect.collidepoint(mpos)) {
         console.log("point collision is happening!");
     }
+
+    BlitJS.draw.rect(display, playerRect, { r: 255, g: 0, b: 0 });
     
     display.blit(blueBox, blueBoxRect.pos);
     display.blit(BlitJS.transform.flip(playerSurf, [flip, false]), playerRect.pos);
