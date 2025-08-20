@@ -1,10 +1,10 @@
 export namespace BlitJS {
 
     export type Color = {
-        r: number,
-        g: number,
-        b: number,
-        a: number
+        r?: number,
+        g?: number,
+        b?: number,
+        a?: number
     }
 
     export class Rect {
@@ -20,6 +20,18 @@ export namespace BlitJS {
             this._h = size[1];
         }
 
+        copy(): Rect {
+            return new Rect([this._x, this._y], [this._w, this._h]);
+        }
+
+        colliderect(other: Rect): boolean {
+            return !(this.left > other.right || this.right < other.left || this.bottom < other.top || this.top > other.bottom)
+        }
+
+        collidepoint(point: [number, number]) {
+            return point[0] >= this.left && point[0] <= this.right && point[1] >= this.top && point[1] <= this.bottom;
+        }
+
         get width() { return this._w; }
         set width(value: number) { this._w = value; }
 
@@ -31,6 +43,9 @@ export namespace BlitJS {
 
         get y() { return this._y; }
         set y(value: number) { this._y = value; }
+
+        get pos(): [number, number] { return [this._x, this._y]; }
+        get size(): [number, number] { return [this._w, this._h]; }
 
         get left() { return this._x; }
         set left(value: number) { this._x = value; }
@@ -50,11 +65,14 @@ export namespace BlitJS {
         ctx: CanvasRenderingContext2D = this.canvas.getContext('2d') as CanvasRenderingContext2D;
         size: [number, number];
         image: HTMLImageElement | null = null;
+        
+        private _rect: Rect;
 
         constructor(size: [number, number]) {
             this.size = size;
             this.canvas.width = size[0];
             this.canvas.height = size[1];
+            this._rect = new Rect([0, 0], size);
         }
 
         fill(color: string = "black"): void {
@@ -65,11 +83,21 @@ export namespace BlitJS {
         }
 
         blit(surface: Surface, pos: [number, number]): void {
-            this.ctx.drawImage(surface.canvas, pos[0], pos[1]);
+            this._rect.x = pos[0];
+            this._rect.y = pos[1];
+            this.ctx.drawImage(surface.canvas, this._rect.x, this._rect.y);
         }
 
         copy(): Surface {
             return new Surface(this.size);
+        }
+
+        getRect(pos?: [number, number]) { 
+            if (pos) {
+                this._rect.x = pos[0];
+                this._rect.y = pos[1];
+            }
+            return this._rect;
         }
     }
 
@@ -113,6 +141,135 @@ export namespace BlitJS {
 
             return flipped;
         }
+    }
+
+    export namespace draw {
+
+        export const rect = (
+            surface: Surface, 
+            rect: Rect, 
+            color: Color = { a: 1 }, 
+            lineWidth: number = 1
+        ) => {
+            surface.ctx.save();
+            surface.ctx.strokeStyle = `rgba(${color.r ?? 0}, ${color.g ?? 0}, ${color.b ?? 0}, ${color.a ?? 1})`;
+            surface.ctx.lineWidth = lineWidth;
+            surface.ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+            surface.ctx.restore();
+        }
+
+        export const fillRect = (
+            surface: Surface, 
+            rect: Rect, 
+            color: Color = { a: 1 }
+        ) => {
+            surface.ctx.save();
+            surface.ctx.fillStyle = `rgba(${color.r ?? 0}, ${color.g ?? 0}, ${color.b ?? 0}, ${color.a ?? 1})`;
+            surface.ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+            surface.ctx.restore();
+        }
+
+        export const circle = (
+            surface: Surface, 
+            pos: [number, number], 
+            radius: number, 
+            color: Color = { a: 1 },
+            lineWidth: number = 1
+        ) => {
+            surface.ctx.save();
+            surface.ctx.strokeStyle = `rgba(${color.r ?? 0}, ${color.g ?? 0}, ${color.b ?? 0}, ${color.a ?? 1})`;
+            surface.ctx.lineWidth = lineWidth;
+            surface.ctx.beginPath();
+            surface.ctx.arc(pos[0], pos[1], radius, 0, 2 * Math.PI, false);
+            surface.ctx.stroke();
+            surface.ctx.restore();
+        }
+
+        export const fillCircle = (
+            surface: Surface, 
+            pos: [number, number], 
+            radius: number, 
+            color: Color = { a: 1 },
+        ) => {
+            surface.ctx.save();
+            surface.ctx.fillStyle = `rgba(${color.r ?? 0}, ${color.g ?? 0}, ${color.b ?? 0}, ${color.a ?? 1})`;
+            surface.ctx.beginPath();
+            surface.ctx.arc(pos[0], pos[1], radius, 0, 2 * Math.PI, false);
+            surface.ctx.fill();
+            surface.ctx.restore();
+        }
+
+        export const line = (
+            surface: Surface,
+            start: [number, number],
+            end: [number, number],
+            color: Color = { a: 1 },
+            lineWidth: number = 1
+        ) => {
+            surface.ctx.save();
+            surface.ctx.strokeStyle = `rgba(${color.r ?? 0}, ${color.g ?? 0}, ${color.b ?? 0}, ${color.a ?? 1})`;
+            surface.ctx.lineWidth = lineWidth;
+            surface.ctx.beginPath();
+            surface.ctx.moveTo(start[0], start[1]);
+            surface.ctx.lineTo(end[0], end[1]);
+            surface.ctx.stroke();
+            surface.ctx.restore();
+        };
+
+        export const arc = (
+            surface: Surface,
+            pos: [number, number],
+            radius: number,
+            startAngle: number,
+            endAngle: number,
+            color: Color = { a: 1 },
+            lineWidth: number = 1
+        ) => {
+            surface.ctx.save();
+            surface.ctx.strokeStyle = `rgba(${color.r ?? 0}, ${color.g ?? 0}, ${color.b ?? 0}, ${color.a ?? 1})`;
+            surface.ctx.lineWidth = lineWidth;
+            surface.ctx.beginPath();
+            surface.ctx.arc(pos[0], pos[1], radius, startAngle, endAngle);
+            surface.ctx.stroke();
+            surface.ctx.restore();
+        };
+
+
+        export const ellipse = (
+            surface: Surface,
+            pos: [number, number],
+            radius: [number, number],
+            rotation: number = 0,
+            startAngle: number = 0,
+            endAngle: number = 2 * Math.PI,
+            color: Color = { a: 1 },
+            lineWidth: number = 1
+        ) => {
+            surface.ctx.save();
+            surface.ctx.strokeStyle = `rgba(${color.r ?? 0}, ${color.g ?? 0}, ${color.b ?? 0}, ${color.a ?? 1})`;
+            surface.ctx.lineWidth = lineWidth;
+            surface.ctx.beginPath();
+            surface.ctx.ellipse(pos[0], pos[1], radius[0], radius[1], rotation, startAngle, endAngle);
+            surface.ctx.stroke();
+            surface.ctx.restore();
+        };
+
+        export const fillEllipse = (
+            surface: Surface,
+            pos: [number, number],
+            radius: [number, number],
+            rotation: number = 0,
+            startAngle: number = 0,
+            endAngle: number = 2 * Math.PI,
+            color: Color = { a: 1 }
+        ) => {
+            surface.ctx.save();
+            surface.ctx.fillStyle = `rgba(${color.r ?? 0}, ${color.g ?? 0}, ${color.b ?? 0}, ${color.a ?? 1})`;
+            surface.ctx.beginPath();
+            surface.ctx.ellipse(pos[0], pos[1], radius[0], radius[1], rotation, startAngle, endAngle);
+            surface.ctx.fill();
+            surface.ctx.restore();
+        };
     }
 
     export namespace display {
@@ -208,6 +365,107 @@ export namespace BlitJS {
         }
     }
 
+    export namespace mouse {
+        
+        let _pos: [number, number] = [0, 0];
+        
+        const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+        canvas.addEventListener("mousemove", (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+
+            _pos[0] = (e.clientX - rect.left) * scaleX;
+            _pos[1] = (e.clientY - rect.top) * scaleY;
+        });
+        
+        export const getPos = (): [number, number] => {
+            return [..._pos];
+        }
+    }
+
+    export enum Keys {
+        A = "a", 
+        B = "b", 
+        C = "c", 
+        D = "d", 
+        E = "e", 
+        F = "f", 
+        G = "g",
+        H = "h", 
+        I = "i", 
+        J = "j", 
+        K = "k", 
+        L = "l",
+        M = "m", 
+        N = "n",
+        O = "o", 
+        P = "p",
+        Q = "q", 
+        R = "r", 
+        S = "s", 
+        T = "t", 
+        U = "u",
+        V = "v", 
+        W = "w", 
+        X = "x", 
+        Y = "y", 
+        Z = "z",
+
+        Num0 = "0", 
+        Num1 = "1", 
+        Num2 = "2", 
+        Num3 = "3", 
+        Num4 = "4",
+        Num5 = "5", 
+        Num6 = "6", 
+        Num7 = "7", 
+        Num8 = "8", 
+        Num9 = "9",
+
+        Shift = "Shift", 
+        Ctrl = "Control", 
+        Alt = "Alt", 
+        Meta = "Meta",
+        CapsLock = "CapsLock",
+        Enter = "Enter", 
+        Space = " ", 
+        Backspace = "Backspace", 
+        Tab = "Tab",
+        Escape = "Escape", 
+        Delete = "Delete", 
+        Home = "Home", 
+        End = "End",
+        PageUp = "PageUp", 
+        PageDown = "PageDown",
+
+        Up = "ArrowUp", 
+        Down = "ArrowDown",
+        Left = "ArrowLeft", 
+        Right = "ArrowRight",
+
+        F1 = "F1", 
+        F2 = "F2", 
+        F3 = "F3", 
+        F4 = "F4", 
+        F5 = "F5", 
+        F6 = "F6",
+        F7 = "F7", 
+        F8 = "F8", 
+        F9 = "F9", 
+        F10 = "F10",
+        F11 = "F11", 
+        F12 = "F12"
+    }
+
+    export enum Buttons {
+        Left,
+        Middle,
+        Right,
+        Back,
+        Forward
+    }
+
     export namespace event {
         export enum EventType {
             KEYDOWN,
@@ -218,8 +476,8 @@ export namespace BlitJS {
 
         export interface Event {
             type: EventType;
-            key?: string;
-            button?: number;
+            key?: Keys;
+            button?: Buttons;
         }
 
         const eventQueue: Event[] = [];
@@ -228,15 +486,15 @@ export namespace BlitJS {
         window.addEventListener("keydown", (e) => {
             if (!pressedKeys.has(e.key)) {
                 pressedKeys.add(e.key);
-                eventQueue.push({ type: EventType.KEYDOWN, key: e.key })
+                eventQueue.push({ type: EventType.KEYDOWN, key: e.key as Keys })
             }
         });
         window.addEventListener("keyup", (e) => {
             pressedKeys.delete(e.key);
-            eventQueue.push({ type: EventType.KEYUP, key: e.key })
+            eventQueue.push({ type: EventType.KEYUP, key: e.key as Keys })
         });
-        window.addEventListener("mousedown", (e) => eventQueue.push({ type: EventType.MOUSEDOWN, button: e.button }));
-        window.addEventListener("mouseup", (e) => eventQueue.push({ type: EventType.MOUSEUP, button: e.button }));
+        window.addEventListener("mousedown", (e) => eventQueue.push({ type: EventType.MOUSEDOWN, button: e.button as Buttons }));
+        window.addEventListener("mouseup", (e) => eventQueue.push({ type: EventType.MOUSEUP, button: e.button as Buttons }));
         window.addEventListener("contextmenu", (e) => e.preventDefault());
 
         export const get = () => {
