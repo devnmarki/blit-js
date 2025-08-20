@@ -145,7 +145,12 @@ export namespace BlitJS {
 
     export namespace draw {
 
-        export const rect = (surface: Surface, rect: Rect, color: Color = { r: 0, g: 0, b: 0, a: 1 }, lineWidth: number = 1) => {
+        export const rect = (
+            surface: Surface, 
+            rect: Rect, 
+            color: Color = { a: 1 }, 
+            lineWidth: number = 1
+        ) => {
             surface.ctx.save();
             surface.ctx.strokeStyle = `rgba(${color.r ?? 0}, ${color.g ?? 0}, ${color.b ?? 0}, ${color.a ?? 1})`;
             surface.ctx.lineWidth = lineWidth;
@@ -153,12 +158,47 @@ export namespace BlitJS {
             surface.ctx.restore();
         }
 
-        export const fillRect = (surface: Surface, rect: Rect, color: Color = { r: 0, g: 0, b: 0, a: 1 }) => {
+        export const fillRect = (
+            surface: Surface, 
+            rect: Rect, 
+            color: Color = { a: 1 }
+        ) => {
             surface.ctx.save();
             surface.ctx.fillStyle = `rgba(${color.r ?? 0}, ${color.g ?? 0}, ${color.b ?? 0}, ${color.a ?? 1})`;
             surface.ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
             surface.ctx.restore();
         }
+
+        export const circle = (
+            surface: Surface, 
+            pos: [number, number], 
+            radius: number, 
+            color: Color = { a: 1 },
+            lineWidth: number = 1
+        ) => {
+            surface.ctx.save();
+            surface.ctx.strokeStyle = `rgba(${color.r ?? 0}, ${color.g ?? 0}, ${color.b ?? 0}, ${color.a ?? 1})`;
+            surface.ctx.lineWidth = lineWidth;
+            surface.ctx.beginPath();
+            surface.ctx.arc(pos[0], pos[1], radius, 0, 2 * Math.PI, false);
+            surface.ctx.stroke();
+            surface.ctx.restore();
+        };
+
+        export const fillCircle = (
+            surface: Surface, 
+            pos: [number, number], 
+            radius: number, 
+            color: Color = { a: 1 },
+        ) => {
+            surface.ctx.save();
+            surface.ctx.fillStyle = `rgba(${color.r ?? 0}, ${color.g ?? 0}, ${color.b ?? 0}, ${color.a ?? 1})`;
+            surface.ctx.beginPath();
+            surface.ctx.arc(pos[0], pos[1], radius, 0, 2 * Math.PI, false);
+            surface.ctx.fill();
+            surface.ctx.restore();
+        };
+
     }
 
     export namespace display {
