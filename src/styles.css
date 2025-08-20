@@ -5,8 +5,12 @@
   padding: 0;
 }
 
-body {
+html, body {
   margin: 0;
   padding: 0;
   overflow: hidden;
+}
+
+canvas {
+  image-rendering: pixelated;
 }
