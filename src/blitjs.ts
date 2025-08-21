@@ -7,128 +7,269 @@ export namespace BlitJS {
         a?: number
     }
 
-    export class Vector2 {
-        constructor(public x: number, public y: number) { }
+    export namespace math {
 
-        // ------------------------
-        // Basic operations
-        // ------------------------
-        add(v: Vector2 | number): Vector2 {
-            if (v instanceof Vector2)
-                return new Vector2(this.x + v.x, this.y + v.y);
+        export class Vector2 {
+            constructor(public x: number, public y: number) { }
 
-            return new Vector2(this.x + v, this.y + v);
+            // ------------------------
+            // Basic operations
+            // ------------------------
+            add(v: Vector2 | number): Vector2 {
+                if (v instanceof Vector2)
+                    return new Vector2(this.x + v.x, this.y + v.y);
+
+                return new Vector2(this.x + v, this.y + v);
+            }
+
+            sub(v: Vector2 | number): Vector2 {
+                if (v instanceof Vector2)
+                    return new Vector2(this.x - v.x, this.y - v.y);
+
+                return new Vector2(this.x - v, this.y - v);
+            }
+
+            mul(v: Vector2 | number): Vector2 {
+                if (v instanceof Vector2)
+                    return new Vector2(this.x * v.x, this.y * v.y);
+
+                return new Vector2(this.x * v, this.y * v);
+            }
+
+            div(v: Vector2 | number): Vector2 {
+                if (v instanceof Vector2)
+                    return new Vector2(this.x / v.x, this.y / v.y);
+
+                return new Vector2(this.x / v, this.y / v);
+            }
+        
+            // ------------------------
+            // Maginute & normalization
+            // ------------------------
+            magnitude(): number {
+                return Math.sqrt(this.x * this.x + this.y * this.y);
+            }
+
+            magnitudeSqr(): number {
+                return this.x * this.x + this.y * this.y;
+            }
+
+            normalize(): Vector2 {
+                const mag = this.magnitude();
+                return mag === 0 ? new Vector2(0, 0) : this.div(mag);
+            }
+
+            normalized(): Vector2 {
+                return this.normalize();
+            }
+
+            // ------------------------
+            // Dot / Cross products
+            // ------------------------
+            dot(v: Vector2): number {
+                return this.x * v.x + this.y * v.y;
+            }
+
+            cross(v: Vector2): number {
+                return this.x * v.y - this.y * v.x;
+            }
+
+            // ------------------------
+            // Angle
+            // ------------------------
+            angle(): number {
+                return Math.atan2(this.y, this.x);
+            }
+
+            angleTo(v: Vector2): number {
+                return Math.atan2(v.y - this.y, v.x - this.x);
+            }
+
+            // ------------------------
+            // Utility
+            // ------------------------
+            copy(): Vector2 {
+                return new Vector2(this.x, this.y);
+            }
+
+            equals(v: Vector2): boolean {
+                return this.x === this.y && this.y === v.y;
+            }
+
+            toString(): string {
+                return `X: ${this.x}, Y: ${this.y}`;
+            }
+
+            // ------------------------
+            // Static constants
+            // ------------------------
+            static readonly zero = new Vector2(0, 0);
+            static readonly one = new Vector2(1, 1);
+            static readonly up = new Vector2(0, -1);
+            static readonly down = new Vector2(0, 1);
+            static readonly left = new Vector2(-1, 0);
+            static readonly right = new Vector2(1, 0);
+
+            // ------------------------
+            // Static helpers
+            // ------------------------
+            static fromAngle(angle: number, length: number = 1): Vector2 {
+                return new Vector2(Math.cos(angle) * length, Math.sin(angle) * length);
+            }
+
+            static lerp(a: Vector2, b: Vector2, t: number): Vector2 {
+                return new Vector2(
+                    a.x + (b.x - a.x) * t,
+                    a.y + (b.y - a.y) * t
+                );
+            }
+
+            static distance(a: Vector2, b: Vector2): number {
+                return a.sub(b).magnitude();
+            }
+
+            static dot(a: Vector2, b: Vector2): number {
+                return a.dot(b);
+            }
         }
 
-        sub(v: Vector2 | number): Vector2 {
-            if (v instanceof Vector2)
-                return new Vector2(this.x - v.x, this.y - v.y);
+        export class Vector3 {
+            constructor(public x: number, public y: number, public z: number) { }
 
-            return new Vector2(this.x - v, this.y - v);
+            // ------------------------
+            // Basic operations
+            // ------------------------
+            add(v: Vector3 | number): Vector3 {
+                if (v instanceof Vector3)
+                    return new Vector3(this.x + v.x, this.y + v.y, this.z + v.z);
+
+                return new Vector3(this.x + v, this.y + v, this.z + v);
+            }
+
+            sub(v: Vector3 | number): Vector3 {
+                if (v instanceof Vector3)
+                    return new Vector3(this.x - v.x, this.y - v.y, this.z - v.z);
+
+                return new Vector3(this.x - v, this.y - v, this.z - v);
+            }
+
+            mul(v: Vector3 | number): Vector3 {
+                if (v instanceof Vector3)
+                    return new Vector3(this.x * v.x, this.y * v.y, this.z * v.z);
+
+                return new Vector3(this.x * v, this.y * v, this.z * v);
+            }
+
+            div(v: Vector3 | number): Vector3 {
+                if (v instanceof Vector3)
+                    return new Vector3(this.x / v.x, this.y / v.y, this.z / v.z);
+
+                return new Vector3(this.x / v, this.y / v, this.z / v);
+            }
+
+            // ------------------------
+            // Magnitude & normalization
+            // ------------------------
+            magnitude(): number {
+                return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+            }
+
+            magnitudeSqr(): number {
+                return this.x * this.x + this.y * this.y + this.z * this.z;
+            }
+
+            normalize(): Vector3 {
+                const mag = this.magnitude();
+                return mag === 0 ? new Vector3(0, 0, 0) : this.div(mag);
+            }
+
+            normalized(): Vector3 {
+                return this.normalize();
+            }
+
+            // ------------------------
+            // Dot / Cross products
+            // ------------------------
+            dot(v: Vector3): number {
+                return this.x * v.x + this.y * v.y + this.z * v.z;
+            }
+
+            cross(v: Vector3): Vector3 {
+                return new Vector3(
+                    this.y * v.z - this.z * v.y,
+                    this.z * v.x - this.x * v.z,
+                    this.x * v.y - this.y * v.x
+                );
+            }
+
+            // ------------------------
+            // Angle
+            // ------------------------
+            angle(): number {
+                return Math.acos(this.dot(Vector3.forward) / this.magnitude());
+            }
+
+            angleTo(v: Vector3): number {
+                const diff = v.sub(this);
+                return Math.acos(diff.dot(Vector3.forward) / diff.magnitude());
+            }
+
+            // ------------------------
+            // Utility
+            // ------------------------
+            copy(): Vector3 {
+                return new Vector3(this.x, this.y, this.z);
+            }
+
+            equals(v: Vector3): boolean {
+                return this.x === v.x && this.y === v.y && this.z === v.z;
+            }
+
+            toString(): string {
+                return `X: ${this.x}, Y: ${this.y}, Z: ${this.z}`;
+            }
+
+            // ------------------------
+            // Static constants
+            // ------------------------
+            static readonly zero = new Vector3(0, 0, 0);
+            static readonly one = new Vector3(1, 1, 1);
+            static readonly up = new Vector3(0, 1, 0);
+            static readonly down = new Vector3(0, -1, 0);
+            static readonly left = new Vector3(-1, 0, 0);
+            static readonly right = new Vector3(1, 0, 0);
+            static readonly forward = new Vector3(0, 0, 1);
+            static readonly back = new Vector3(0, 0, -1);
+
+            // ------------------------
+            // Static helpers
+            // ------------------------
+            static fromAngle(theta: number, phi: number, length: number = 1): Vector3 {
+                const sinPhi = Math.sin(phi);
+                return new Vector3(
+                    Math.cos(theta) * sinPhi * length,
+                    Math.sin(theta) * sinPhi * length,
+                    Math.cos(phi) * length
+                );
+            }
+
+            static lerp(a: Vector3, b: Vector3, t: number): Vector3 {
+                return new Vector3(
+                    a.x + (b.x - a.x) * t,
+                    a.y + (b.y - a.y) * t,
+                    a.z + (b.z - a.z) * t
+                );
+            }
+
+            static distance(a: Vector3, b: Vector3): number {
+                return a.sub(b).magnitude();
+            }
+
+            static dot(a: Vector3, b: Vector3): number {
+                return a.dot(b);
+            }
         }
-
-        mul(v: Vector2 | number): Vector2 {
-            if (v instanceof Vector2)
-                return new Vector2(this.x * v.x, this.y * v.y);
-
-            return new Vector2(this.x * v, this.y * v);
-        }
-
-        div(v: Vector2 | number): Vector2 {
-            if (v instanceof Vector2)
-                return new Vector2(this.x / v.x, this.y / v.y);
-
-            return new Vector2(this.x / v, this.y / v);
-        }
-    
-        // ------------------------
-        // Maginute & normalization
-        // ------------------------
-        magnitude(): number {
-            return Math.sqrt(this.x * this.x + this.y * this.y);
-        }
-
-        magnitudeSqr(): number {
-            return this.x * this.x + this.y * this.y;
-        }
-
-        normalize(): Vector2 {
-            const mag = this.magnitude();
-            return mag === 0 ? new Vector2(0, 0) : this.div(mag);
-        }
-
-        normalized(): Vector2 {
-            return this.normalize();
-        }
-
-        // ------------------------
-        // Dot / Cross products
-        // ------------------------
-        dot(v: Vector2): number {
-            return this.x * v.x + this.y * v.y;
-        }
-
-        cross(v: Vector2): number {
-            return this.x * v.y - this.y * v.x;
-        }
-
-        // ------------------------
-        // Angle
-        // ------------------------
-        angle(): number {
-            return Math.atan2(this.y, this.x);
-        }
-
-        angleTo(v: Vector2): number {
-            return Math.atan2(v.y - this.y, v.x - this.x);
-        }
-
-        // ------------------------
-        // Utility
-        // ------------------------
-        copy(): Vector2 {
-            return new Vector2(this.x, this.y);
-        }
-
-        equals(v: Vector2): boolean {
-            return this.x === this.y && this.y === v.y;
-        }
-
-        toString(): string {
-            return `X: ${this.x}, Y: ${this.y}`;
-        }
-
-        // ------------------------
-        // Static constants
-        // ------------------------
-        static readonly zero = new Vector2(0, 0);
-        static readonly one = new Vector2(1, 1);
-        static readonly up = new Vector2(0, -1);
-        static readonly down = new Vector2(0, 1);
-        static readonly left = new Vector2(-1, 0);
-        static readonly right = new Vector2(1, 0);
-
-        // ------------------------
-        // Static helpers
-        // ------------------------
-        static fromAngle(angle: number, length: number = 1): Vector2 {
-            return new Vector2(Math.cos(angle) * length, Math.sin(angle) * length);
-        }
-
-        static lerp(a: Vector2, b: Vector2, t: number): Vector2 {
-            return new Vector2(
-                a.x + (b.x - a.x) * t,
-                a.y + (b.y - a.y) * t
-            );
-        }
-
-        static distance(a: Vector2, b: Vector2): number {
-            return a.sub(b).magnitude();
-        }
-
-        static dot(a: Vector2, b: Vector2): number {
-            return a.dot(b);
-        }
+        
     }
 
     export class Rect {
