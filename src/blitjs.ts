@@ -197,6 +197,7 @@ export namespace BlitJS {
         image: HTMLImageElement | null = null;
         
         private _rect: Rect;
+        private _colorkey: Color | null = null;
 
         constructor(size: [number, number]) {
             this.size = size;
@@ -236,6 +237,63 @@ export namespace BlitJS {
             }
             return this._rect;
         }
+
+        getAt(pos: [number, number]): [number, number, number, number] {
+            const id = this.ctx.getImageData(pos[0], pos[1], 1, 1);
+            const d = id.data;
+            return [d[0], d[1], d[2], d[3]];
+        }
+
+        setAt(pos: [number, number], color: string | [number, number, number] | [number, number, number, number]) {
+            let r: number, g: number, b: number, a: number = 255;
+            if (typeof color === 'string') {
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = 1;
+                tempCanvas.height = 1;
+                const tempCtx = tempCanvas.getContext('2d')!;
+                tempCtx.fillStyle = color;
+                tempCtx.fillRect(0, 0, 1, 1);
+                const data = tempCtx.getImageData(0, 0, 1, 1).data;
+                r = data[0];
+                g = data[1];
+                b = data[2];
+                a = data[3];
+            } else if (color.length === 3) {
+                [r, g, b] = color;
+            } else if (color.length === 4) {
+                [r, g, b, a] = color;
+            } else {
+                throw new Error("Invalid color format");
+            }
+            const id = this.ctx.createImageData(1, 1);
+            id.data[0] = r;
+            id.data[1] = g;
+            id.data[2] = b;
+            id.data[3] = a;
+            this.ctx.putImageData(id, pos[0], pos[1]);
+        }
+
+        setColorKey(color: Color | null = null): void {
+            this._colorkey = color;
+            if (color !== null) {
+                const id = this.ctx.getImageData(0, 0, this.size[0], this.size[1]);
+                const d = id.data;
+                const r = color.r ?? 0;
+                const g = color.g ?? 0;
+                const b = color.b ?? 0;
+                for (let i = 0; i < d.length; i += 4) {
+                    if (d[i] === r && d[i + 1] === g && d[i + 2] === b) {
+                        d[i + 3] = 0;
+                    }
+                }
+                this.ctx.putImageData(id, 0, 0);
+            }
+            // Note: Setting to null disables colorkey but does not restore original alphas
+        }
+
+        getColorKey(): Color | null {
+            return this._colorkey;
+        }
     }
 
     export namespace image {
@@ -259,6 +317,7 @@ export namespace BlitJS {
 
     export namespace transform {
 
+        // Returns new scaled surface
         export const scale = (surf: Surface, size: [number, number]): Surface => {
             const scaled = new Surface(size);
             scaled.ctx.imageSmoothingEnabled = false;
@@ -266,6 +325,7 @@ export namespace BlitJS {
             return scaled;
         }
 
+        // Returns new rotated surface
         export const rotate = (surf: Surface, angle: number): Surface => {
             const rad = angle * Math.PI / 180;
             const w = surf.size[0];
@@ -285,6 +345,7 @@ export namespace BlitJS {
             return rotated;
         }
 
+        // Returns new flipped surface
         export const flip = (surf: Surface, flip: [boolean, boolean]): Surface => {
             const w = surf.size[0];
             const h = surf.size[1];
@@ -586,6 +647,120 @@ export namespace BlitJS {
 
     }
 
+    export namespace mask {
+
+        export class Mask {
+            private _width: number;
+            private _height: number;
+            private _data: Uint8Array;
+
+            constructor(width: number, height: number) {
+                this._width = width;
+                this._height = height;
+                this._data = new Uint8Array(width * height);
+            }
+
+            getSize(): [number, number] {
+                return [this._width, this._height];
+            }
+
+            getAt(x: number, y: number): boolean {
+                if (x < 0 || x >= this._width || y < 0 || y >= this._height) {
+                    throw new Error("Index out of bounds");
+                }
+                return this._data[y * this._width + x] === 1;
+            }
+
+            setAt(x: number, y: number, value: boolean) {
+                if (x < 0 || x >= this._width || y < 0 || y >= this._height) {
+                    throw new Error("Index out of bounds");
+                }
+                this._data[y * this._width + x] = value ? 1 : 0;
+            }
+
+            count(): number {
+                return this._data.reduce((acc, val) => acc + val, 0);
+            }
+
+            overlap(other: Mask, offset: [number, number]): [number, number] | null {
+                const ox = Math.floor(offset[0]);
+                const oy = Math.floor(offset[1]);
+
+                const x0 = Math.max(0, ox);
+                const y0 = Math.max(0, oy);
+                const x1 = Math.min(this._width, ox + other._width);
+                const y1 = Math.min(this._height, oy + other._height);
+
+                if (x0 >= x1 || y0 >= y1) {
+                    return null;
+                }
+
+                for (let y = y0; y < y1; y++) {
+                    for (let x = x0; x < x1; x++) {
+                        const thisVal = this.getAt(x, y);
+                        const otherX = x - ox;
+                        const otherY = y - oy;
+                        const otherVal = other.getAt(otherX, otherY);
+
+                        if (thisVal && otherVal) {
+                            return [x, y];
+                        }
+                    }
+                }
+
+                return null;
+            }
+
+            fill() {
+                this._data.fill(1);
+            }
+
+            clear() {
+                this._data.fill(0);
+            }
+        }
+
+        export const fromSurface = (surf: Surface, threshold: number = 127): Mask => {
+            const [w, h] = surf.size;
+            const m = new Mask(w, h);
+            const imageData = surf.ctx.getImageData(0, 0, w, h);
+            const pixels = imageData.data;
+
+            for (let i = 0; i < pixels.length; i += 4) {
+                const alpha = pixels[i + 3];
+                if (alpha > threshold) {
+                    const px = (i / 4) % w;
+                    const py = Math.floor((i / 4) / w);
+                    m.setAt(px, py, true);
+                }
+            }
+
+            return m;
+        }
+
+        export const toSurface = (mask: Mask, setcolor: Color = { r: 255, g: 255, b: 255, a: 1 }, unsetcolor: Color = { r: 0, g: 0, b: 0, a: 1 }): Surface => {
+            const [w, h] = mask.getSize();
+            const surf = new Surface([w, h]);
+            const id = surf.ctx.createImageData(w, h);
+            const d = id.data;
+
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
+                    const idx = (y * w + x) * 4;
+                    const col = mask.getAt(x, y) ? setcolor : unsetcolor;
+                    d[idx] = col.r ?? 0;
+                    d[idx + 1] = col.g ?? 0;
+                    d[idx + 2] = col.b ?? 0;
+                    d[idx + 3] = Math.round((col.a ?? 1) * 255);
+                }
+            }
+
+            surf.ctx.putImageData(id, 0, 0);
+            return surf;
+        }
+
+    }
+
     export namespace display {
 
         class Display
@@ -708,10 +883,12 @@ export namespace BlitJS {
             _pos[1] = (e.clientY - rect.top) * scaleY;
         });
         
+        // Get current mouse position
         export const getPos = (): [number, number] => {
             return [..._pos];
         }
 
+        // Get amount of mouse movement
         export const getRel = (): [number, number] => {
             const deltaX = _pos[0] - _lastPos[0]; 
             const deltaY = _pos[1] - _lastPos[1];
@@ -721,12 +898,14 @@ export namespace BlitJS {
             return [deltaX, deltaY]; 
         }
 
+        // Set cursor visiblity
         export const setVisible = (visible: boolean) => {
             if (display.display) {
                 display.display.cursorVisible = visible;
             }
         }
 
+        // Get cursor visiblity
         export const getVisible = (): boolean => {
             if (display.display)
                 return display.display?.cursorVisible;
