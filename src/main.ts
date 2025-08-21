@@ -18,6 +18,7 @@ const music = new BlitJS.audio.Music("./music/rosalia.mp3");
 
 let movement = [false, false];
 let flip: boolean = false;
+let rot = 0;
 
 const loop = () => {
     clock.tick();
@@ -42,6 +43,12 @@ const loop = () => {
                 movement[0] = false;
             if (e.key == BlitJS.Keys.D)
                 movement[1] = false;
+        }
+        if (e.type == BlitJS.event.EventType.MouseDown) {
+            if (e.button == BlitJS.Buttons.Right)
+                BlitJS.mouse.setVisible(false)
+            if (e.button == BlitJS.Buttons.Left)
+                BlitJS.mouse.setVisible(true)
         }
     }
 
@@ -71,7 +78,11 @@ const loop = () => {
 
     let textSurf = testFont.render("Hello, World!");
     
-    display.blit(blueBox, blueBoxRect.pos);
+    rot++;
+
+    let blueBoxCopy = BlitJS.transform.rotate(blueBox, rot);
+    display.blit(blueBoxCopy, [blueBoxRect.pos[0] - blueBoxCopy.size[0] / 2, blueBoxRect.pos[1] - blueBoxCopy.size[1] / 2]);
+
     display.blit(BlitJS.transform.flip(playerSurf, [flip, false]), playerRect.pos);
     
     screen.blit(BlitJS.transform.scale(display, BlitJS.display.getSize()), [0, 0]);

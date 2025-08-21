@@ -266,6 +266,25 @@ export namespace BlitJS {
             return scaled;
         }
 
+        export const rotate = (surf: Surface, angle: number): Surface => {
+            const rad = angle * Math.PI / 180;
+            const w = surf.size[0];
+            const h = surf.size[1];
+            const cos = Math.abs(Math.cos(rad));
+            const sin = Math.abs(Math.sin(rad));
+            const newW = Math.ceil(w * cos + h * sin);
+            const newH = Math.ceil(w * sin + h * cos);
+
+            const rotated = new Surface([newW, newH]);
+
+            rotated.ctx.imageSmoothingEnabled = false;
+            rotated.ctx.translate(newW / 2, newH / 2);
+            rotated.ctx.rotate(rad);
+            rotated.ctx.drawImage(surf.canvas, -w / 2, -h / 2);
+
+            return rotated;
+        }
+
         export const flip = (surf: Surface, flip: [boolean, boolean]): Surface => {
             const w = surf.size[0];
             const h = surf.size[1];
@@ -574,6 +593,7 @@ export namespace BlitJS {
             canvas: HTMLCanvasElement = document.getElementById('canvas') as HTMLCanvasElement;
             ctx: CanvasRenderingContext2D = this.canvas.getContext('2d') as CanvasRenderingContext2D;
             surface: Surface;
+            cursorVisible: boolean = true;
 
             constructor(size: [number, number]) {
                 this.canvas.width = size[0];
@@ -594,11 +614,12 @@ export namespace BlitJS {
 
             // Update display canvas
             update(): void {
+                this.canvas.style.cursor = this.cursorVisible ? 'default' : 'none';
                 this.ctx.drawImage(this.surface.canvas, 0, 0);
             }
         }
         
-        let display: Display | null = null;
+        export let display: Display | null = null;
 
         // Returns new display with given size
         export const setMode = (size: [number, number]): Display => {
@@ -674,6 +695,7 @@ export namespace BlitJS {
     export namespace mouse {
         
         let _pos: [number, number] = [0, 0];
+        let _lastPos: [number, number] = [0, 0];
         
         // Calculate mouse position when moving mouse
         const canvas = document.getElementById('canvas') as HTMLCanvasElement;
@@ -688,6 +710,28 @@ export namespace BlitJS {
         
         export const getPos = (): [number, number] => {
             return [..._pos];
+        }
+
+        export const getRel = (): [number, number] => {
+            const deltaX = _pos[0] - _lastPos[0]; 
+            const deltaY = _pos[1] - _lastPos[1];
+            
+            _lastPos = [..._pos];
+            
+            return [deltaX, deltaY]; 
+        }
+
+        export const setVisible = (visible: boolean) => {
+            if (display.display) {
+                display.display.cursorVisible = visible;
+            }
+        }
+
+        export const getVisible = (): boolean => {
+            if (display.display)
+                return display.display?.cursorVisible;
+
+            return true;
         }
     }
 
