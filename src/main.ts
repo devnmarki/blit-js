@@ -29,6 +29,12 @@ const testFont = new BlitJS.font.Font("MedodicaRegular", 128);
 const jumpSfx = new BlitJS.audio.Sound("./sfx/jump.wav");
 const music = new BlitJS.audio.Music("./music/rosalia.mp3");
 
+const vec2 = new BlitJS.math.Vector2(10, 20);
+const vec3 = new BlitJS.math.Vector3(20, 30, 64);
+
+console.log(vec2);
+console.log(vec3);
+
 let movement = [false, false];
 let flip: boolean = false;
 let rot = 0;
@@ -107,7 +113,6 @@ const loop = () => {
     display.blit(newPlayerSurf, [playerRect.pos[0] + offset, playerRect.pos[1] + offset]);
     display.blit(newPlayerSurf, [playerRect.pos[0] - offset, playerRect.pos[1] + offset]);
     display.blit(newPlayerSurf, [playerRect.pos[0] - offset, playerRect.pos[1] - offset]);
-
 
     display.blit(BlitJS.transform.flip(playerSurf, [flip, false]), playerRect.pos);
 

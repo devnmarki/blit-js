@@ -44,7 +44,7 @@ export namespace BlitJS {
             }
         
             // ------------------------
-            // Maginute & normalization
+            // Magnitude & normalization
             // ------------------------
             magnitude(): number {
                 return Math.sqrt(this.x * this.x + this.y * this.y);
@@ -269,6 +269,8 @@ export namespace BlitJS {
                 return a.dot(b);
             }
         }
+
+        export const lerp = (a: number, b: number, t: number): number => a + (b - a) * t;
         
     }
 
