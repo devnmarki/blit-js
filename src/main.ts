@@ -14,6 +14,7 @@ const playerRect = playerSurf.getRect([200, 100]);
 const testFont = new BlitJS.font.Font("MedodicaRegular", 128);
 
 const jumpSfx = new BlitJS.audio.Sound("./sfx/jump.wav");
+const music = new BlitJS.audio.Music("./music/rosalia.mp3");
 
 let movement = [false, false];
 let flip: boolean = false;
@@ -31,6 +32,10 @@ const loop = () => {
                 movement[1] = true;
             if (e.key == BlitJS.Keys.Space)
                 jumpSfx.play();
+            if (e.key == BlitJS.Keys.O)
+                music.play();
+            if (e.key == BlitJS.Keys.P)
+                music.pause();
         }
         if (e.type == BlitJS.event.EventType.KeyUp) {
             if (e.key == BlitJS.Keys.A)

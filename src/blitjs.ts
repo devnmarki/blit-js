@@ -499,6 +499,41 @@ export namespace BlitJS {
             }
         }
 
+        export class Music {
+            private _audio: HTMLAudioElement;
+
+            constructor(filename: string) {
+                this._audio = new Audio(filename);
+                this._audio.load();
+            }
+
+            play(loop: boolean = true) {
+                this._audio.loop = loop;
+                this._audio.play();
+            }
+
+            pause() {
+                this._audio.pause();
+            }
+
+            stop() {
+                this._audio.pause();
+                this._audio.currentTime = 0;
+            }
+
+            set volume(volume: number) { 
+                this._audio.volume = volume;
+            }
+
+            get volume() {
+                return this._audio.volume;
+            }
+
+            get duration() {
+                return this._audio.duration;
+            }
+        }
+
     }
 
     export namespace display {
