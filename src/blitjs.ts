@@ -93,7 +93,7 @@ export namespace BlitJS {
             }
 
             equals(v: Vector2): boolean {
-                return this.x === this.y && this.y === v.y;
+                return this.x === v.x && this.y === v.y;
             }
 
             toString(): string {
@@ -271,8 +271,10 @@ export namespace BlitJS {
         }
 
         export const lerp = (a: number, b: number, t: number): number => a + (b - a) * t;
-
         export const clamp = (value: number, min: number, max: number): number => Math.max(min, Math.min(max, value));
+        export const randRange = (min: number, max: number) => Math.random() * (max - min) + min;
+        export const deg2rad = (deg: number) => deg * Math.PI / 180;
+        export const rad2deg = (rad: number) => rad * 180 / Math.PI;
         
     }
 
