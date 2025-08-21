@@ -1,4 +1,4 @@
-import { BlitJS } from './blitjs'; 
+import { BlitJS } from 'blit-js'; 
 
 const screen = BlitJS.display.setMode([1280, 720]);
 const clock = new BlitJS.time.Clock();

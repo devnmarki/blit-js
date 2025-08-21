@@ -1,6 +1,9 @@
 {
   "name": "blit-js",
   "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "version": "0.1.0",
   "type": "module",
   "scripts": {

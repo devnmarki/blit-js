@@ -8,12 +8,12 @@ It provides familiar constructs like Surface, Vector2, Rect, Sprite, and Scene m
 ## ✨ Features
 - Graphics
     * `Surface` wrapper around `<canvas>` with blitting support
-    * Easy image loading via `image.load()`
+    * Easy image loading via `BlitJS.image.load()`
     * Drawing utilities(`line`, `rect`, etc.)
 - Audio
-    * `mixer.Sound` and `mixer.Music` wrappers around `HTMLAudioElement`
+    * `BlitJS.audio.Sound` and `BlitJS.audio.Music` wrappers around `HTMLAudioElement`
 - Display
-    * `display.setMode()` → create the game canvas
+    * `BlitJS.display.setMode()` → create the game canvas
     * `display.update()` → update the screen
 - Core Math Utilities
     * `Vector2`, `Vector3` with common operations (dot, cross, normalize, etc.)
