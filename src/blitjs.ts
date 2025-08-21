@@ -465,37 +465,68 @@ export namespace BlitJS {
     export namespace audio {
 
         export class Sound {
-            private _audio: HTMLAudioElement;
+            private _filename: string;
+            private _players: SoundPlayer[] = [];
 
             constructor(filename: string) {
-                this._audio = new Audio(filename);
-                this._audio.load();
-                this._audio.loop = false;
+                this._filename = filename;
             }
 
-            play() {
-                this._audio.play();
-            }
+            play(): SoundPlayer {
+                const player = new SoundPlayer(this._filename);
+                this._players.push(player);
+                player.play();
 
-            pause() {
-                this._audio.pause();
+                player.audio.onended = () => {
+                    this._players = this._players.filter(p => p !== player);
+                }
+
+                return player;
             }
 
             stop() {
-                this._audio.pause();
-                this._audio.currentTime = 0;
+                this._players.forEach(p => p.stop());
+                this._players = [];
+            }
+
+            pause() {
+                this._players.forEach(p => p.pause());
+            }
+        }
+
+
+        class SoundPlayer {
+            public audio: HTMLAudioElement;
+
+            constructor(filename: string) {
+                this.audio = new Audio(filename);
+                this.audio.load();
+                this.audio.loop = false;
+            }
+
+            play() {
+                this.audio.play();
+            }
+
+            pause() {
+                this.audio.pause();
+            }
+
+            stop() {
+                this.audio.pause();
+                this.audio.currentTime = 0;
             }
 
             set volume(volume: number) { 
-                this._audio.volume = volume;
+                this.audio.volume = volume;
             }
 
             get volume() {
-                return this._audio.volume;
+                return this.audio.volume;
             }
 
             get duration() {
-                return this._audio.duration;
+                return this.audio.duration;
             }
         }
 

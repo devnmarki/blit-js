@@ -33,7 +33,7 @@ const loop = () => {
             if (e.key == BlitJS.Keys.Space)
                 jumpSfx.play();
             if (e.key == BlitJS.Keys.O)
-                music.play();
+                music.play(true);
             if (e.key == BlitJS.Keys.P)
                 music.pause();
         }
