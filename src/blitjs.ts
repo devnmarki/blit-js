@@ -695,6 +695,7 @@ export namespace BlitJS {
     export namespace mouse {
         
         let _pos: [number, number] = [0, 0];
+        let _lastPos: [number, number] = [0, 0];
         
         // Calculate mouse position when moving mouse
         const canvas = document.getElementById('canvas') as HTMLCanvasElement;
@@ -709,6 +710,15 @@ export namespace BlitJS {
         
         export const getPos = (): [number, number] => {
             return [..._pos];
+        }
+
+        export const getRel = (): [number, number] => {
+            const deltaX = _pos[0] - _lastPos[0]; 
+            const deltaY = _pos[1] - _lastPos[1];
+            
+            _lastPos = [..._pos];
+            
+            return [deltaX, deltaY]; 
         }
 
         export const setVisible = (visible: boolean) => {

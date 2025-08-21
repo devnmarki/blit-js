@@ -19,7 +19,6 @@ const music = new BlitJS.audio.Music("./music/rosalia.mp3");
 let movement = [false, false];
 let flip: boolean = false;
 let rot = 0;
-let cursor = true;
 
 const loop = () => {
     clock.tick();
