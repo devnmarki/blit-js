@@ -281,7 +281,7 @@ export namespace BlitJS {
             rotated.ctx.translate(newW / 2, newH / 2);
             rotated.ctx.rotate(rad);
             rotated.ctx.drawImage(surf.canvas, -w / 2, -h / 2);
-            
+
             return rotated;
         }
 
@@ -593,6 +593,7 @@ export namespace BlitJS {
             canvas: HTMLCanvasElement = document.getElementById('canvas') as HTMLCanvasElement;
             ctx: CanvasRenderingContext2D = this.canvas.getContext('2d') as CanvasRenderingContext2D;
             surface: Surface;
+            cursorVisible: boolean = true;
 
             constructor(size: [number, number]) {
                 this.canvas.width = size[0];
@@ -613,11 +614,12 @@ export namespace BlitJS {
 
             // Update display canvas
             update(): void {
+                this.canvas.style.cursor = this.cursorVisible ? 'default' : 'none';
                 this.ctx.drawImage(this.surface.canvas, 0, 0);
             }
         }
         
-        let display: Display | null = null;
+        export let display: Display | null = null;
 
         // Returns new display with given size
         export const setMode = (size: [number, number]): Display => {
@@ -707,6 +709,19 @@ export namespace BlitJS {
         
         export const getPos = (): [number, number] => {
             return [..._pos];
+        }
+
+        export const setVisible = (visible: boolean) => {
+            if (display.display) {
+                display.display.cursorVisible = visible;
+            }
+        }
+
+        export const getVisible = (): boolean => {
+            if (display.display)
+                return display.display?.cursorVisible;
+
+            return true;
         }
     }
 
