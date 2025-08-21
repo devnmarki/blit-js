@@ -22,7 +22,7 @@ It provides familiar constructs like Surface, Vector2, Rect, Sprite, and Scene m
 - Masks
 
 ## 📦 Installation
-```
+```shell
 # Clone the repo
 git clone https://github.com/devnmarki/blit-js.git
 cd blit-js
