@@ -6,7 +6,7 @@ const display = new BlitJS.Surface([BlitJS.display.getWidth() / 2, BlitJS.displa
 
 const blueBox = new BlitJS.Surface([32, 64]);
 const blueBoxRect = blueBox.getRect([16 * 8, 16 * 5]);
-blueBox.fill('blue');
+blueBox.fill({r: 0, g: 0, b: 255, a: 1});
 
 const playerSurf = await BlitJS.image.load("./images/player.png");
 const playerRect = playerSurf.getRect([200, 100]);
@@ -42,7 +42,7 @@ let rot = 0;
 const loop = () => {
     clock.tick(60);
 
-    display.fill('green');
+    display.fill({r: 0, g: 255, b: 1});
 
     for (const e of BlitJS.event.get()) {
         if (e.type == BlitJS.event.EventType.KeyDown) {

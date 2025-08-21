@@ -111,7 +111,7 @@ declare namespace BlitJS {
         private _rect;
         private _colorkey;
         constructor(size: [number, number]);
-        fill(color?: string): void;
+        fill(color: Color): void;
         blit(surface: Surface, pos: [number, number]): void;
         copy(): Surface;
         getRect(pos?: [number, number]): Rect;
@@ -200,7 +200,7 @@ declare namespace BlitJS {
             surface: Surface;
             cursorVisible: boolean;
             constructor(size: [number, number]);
-            fill(color?: string): void;
+            fill(color: Color): void;
             blit(surf: Surface, pos: [number, number]): void;
             update(): void;
         }

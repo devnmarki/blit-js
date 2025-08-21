@@ -327,9 +327,9 @@ var BlitJS;
     // ------------------------
     // Rendering
     // ------------------------
-    fill(color = "black") {
+    fill(color) {
       this.ctx.save();
-      this.ctx.fillStyle = color;
+      this.ctx.fillStyle = `rgba(${color.r ?? 0}, ${color.g ?? 0}, ${color.b ?? 0}, ${color.a ?? 1})`;
       this.ctx.fillRect(0, 0, this.size[0], this.size[1]);
       this.ctx.restore();
     }
@@ -745,7 +745,7 @@ var BlitJS;
       // ------------------------
       // Render with display surface
       // ------------------------
-      fill(color = "black") {
+      fill(color) {
         this.surface.fill(color);
       }
       blit(surf, pos) {
