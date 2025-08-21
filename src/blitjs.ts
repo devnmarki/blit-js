@@ -7,128 +7,273 @@ export namespace BlitJS {
         a?: number
     }
 
-    export class Vector2 {
-        constructor(public x: number, public y: number) { }
+    export namespace math {
 
-        // ------------------------
-        // Basic operations
-        // ------------------------
-        add(v: Vector2 | number): Vector2 {
-            if (v instanceof Vector2)
-                return new Vector2(this.x + v.x, this.y + v.y);
+        export class Vector2 {
+            constructor(public x: number, public y: number) { }
 
-            return new Vector2(this.x + v, this.y + v);
+            // ------------------------
+            // Basic operations
+            // ------------------------
+            add(v: Vector2 | number): Vector2 {
+                if (v instanceof Vector2)
+                    return new Vector2(this.x + v.x, this.y + v.y);
+
+                return new Vector2(this.x + v, this.y + v);
+            }
+
+            sub(v: Vector2 | number): Vector2 {
+                if (v instanceof Vector2)
+                    return new Vector2(this.x - v.x, this.y - v.y);
+
+                return new Vector2(this.x - v, this.y - v);
+            }
+
+            mul(v: Vector2 | number): Vector2 {
+                if (v instanceof Vector2)
+                    return new Vector2(this.x * v.x, this.y * v.y);
+
+                return new Vector2(this.x * v, this.y * v);
+            }
+
+            div(v: Vector2 | number): Vector2 {
+                if (v instanceof Vector2)
+                    return new Vector2(this.x / v.x, this.y / v.y);
+
+                return new Vector2(this.x / v, this.y / v);
+            }
+        
+            // ------------------------
+            // Magnitude & normalization
+            // ------------------------
+            magnitude(): number {
+                return Math.sqrt(this.x * this.x + this.y * this.y);
+            }
+
+            magnitudeSqr(): number {
+                return this.x * this.x + this.y * this.y;
+            }
+
+            normalize(): Vector2 {
+                const mag = this.magnitude();
+                return mag === 0 ? new Vector2(0, 0) : this.div(mag);
+            }
+
+            normalized(): Vector2 {
+                return this.normalize();
+            }
+
+            // ------------------------
+            // Dot / Cross products
+            // ------------------------
+            dot(v: Vector2): number {
+                return this.x * v.x + this.y * v.y;
+            }
+
+            cross(v: Vector2): number {
+                return this.x * v.y - this.y * v.x;
+            }
+
+            // ------------------------
+            // Angle
+            // ------------------------
+            angle(): number {
+                return Math.atan2(this.y, this.x);
+            }
+
+            angleTo(v: Vector2): number {
+                return Math.atan2(v.y - this.y, v.x - this.x);
+            }
+
+            // ------------------------
+            // Utility
+            // ------------------------
+            copy(): Vector2 {
+                return new Vector2(this.x, this.y);
+            }
+
+            equals(v: Vector2): boolean {
+                return this.x === this.y && this.y === v.y;
+            }
+
+            toString(): string {
+                return `X: ${this.x}, Y: ${this.y}`;
+            }
+
+            // ------------------------
+            // Static constants
+            // ------------------------
+            static readonly zero = new Vector2(0, 0);
+            static readonly one = new Vector2(1, 1);
+            static readonly up = new Vector2(0, -1);
+            static readonly down = new Vector2(0, 1);
+            static readonly left = new Vector2(-1, 0);
+            static readonly right = new Vector2(1, 0);
+
+            // ------------------------
+            // Static helpers
+            // ------------------------
+            static fromAngle(angle: number, length: number = 1): Vector2 {
+                return new Vector2(Math.cos(angle) * length, Math.sin(angle) * length);
+            }
+
+            static lerp(a: Vector2, b: Vector2, t: number): Vector2 {
+                return new Vector2(
+                    a.x + (b.x - a.x) * t,
+                    a.y + (b.y - a.y) * t
+                );
+            }
+
+            static distance(a: Vector2, b: Vector2): number {
+                return a.sub(b).magnitude();
+            }
+
+            static dot(a: Vector2, b: Vector2): number {
+                return a.dot(b);
+            }
         }
 
-        sub(v: Vector2 | number): Vector2 {
-            if (v instanceof Vector2)
-                return new Vector2(this.x - v.x, this.y - v.y);
+        export class Vector3 {
+            constructor(public x: number, public y: number, public z: number) { }
 
-            return new Vector2(this.x - v, this.y - v);
+            // ------------------------
+            // Basic operations
+            // ------------------------
+            add(v: Vector3 | number): Vector3 {
+                if (v instanceof Vector3)
+                    return new Vector3(this.x + v.x, this.y + v.y, this.z + v.z);
+
+                return new Vector3(this.x + v, this.y + v, this.z + v);
+            }
+
+            sub(v: Vector3 | number): Vector3 {
+                if (v instanceof Vector3)
+                    return new Vector3(this.x - v.x, this.y - v.y, this.z - v.z);
+
+                return new Vector3(this.x - v, this.y - v, this.z - v);
+            }
+
+            mul(v: Vector3 | number): Vector3 {
+                if (v instanceof Vector3)
+                    return new Vector3(this.x * v.x, this.y * v.y, this.z * v.z);
+
+                return new Vector3(this.x * v, this.y * v, this.z * v);
+            }
+
+            div(v: Vector3 | number): Vector3 {
+                if (v instanceof Vector3)
+                    return new Vector3(this.x / v.x, this.y / v.y, this.z / v.z);
+
+                return new Vector3(this.x / v, this.y / v, this.z / v);
+            }
+
+            // ------------------------
+            // Magnitude & normalization
+            // ------------------------
+            magnitude(): number {
+                return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+            }
+
+            magnitudeSqr(): number {
+                return this.x * this.x + this.y * this.y + this.z * this.z;
+            }
+
+            normalize(): Vector3 {
+                const mag = this.magnitude();
+                return mag === 0 ? new Vector3(0, 0, 0) : this.div(mag);
+            }
+
+            normalized(): Vector3 {
+                return this.normalize();
+            }
+
+            // ------------------------
+            // Dot / Cross products
+            // ------------------------
+            dot(v: Vector3): number {
+                return this.x * v.x + this.y * v.y + this.z * v.z;
+            }
+
+            cross(v: Vector3): Vector3 {
+                return new Vector3(
+                    this.y * v.z - this.z * v.y,
+                    this.z * v.x - this.x * v.z,
+                    this.x * v.y - this.y * v.x
+                );
+            }
+
+            // ------------------------
+            // Angle
+            // ------------------------
+            angle(): number {
+                return Math.acos(this.dot(Vector3.forward) / this.magnitude());
+            }
+
+            angleTo(v: Vector3): number {
+                const diff = v.sub(this);
+                return Math.acos(diff.dot(Vector3.forward) / diff.magnitude());
+            }
+
+            // ------------------------
+            // Utility
+            // ------------------------
+            copy(): Vector3 {
+                return new Vector3(this.x, this.y, this.z);
+            }
+
+            equals(v: Vector3): boolean {
+                return this.x === v.x && this.y === v.y && this.z === v.z;
+            }
+
+            toString(): string {
+                return `X: ${this.x}, Y: ${this.y}, Z: ${this.z}`;
+            }
+
+            // ------------------------
+            // Static constants
+            // ------------------------
+            static readonly zero = new Vector3(0, 0, 0);
+            static readonly one = new Vector3(1, 1, 1);
+            static readonly up = new Vector3(0, 1, 0);
+            static readonly down = new Vector3(0, -1, 0);
+            static readonly left = new Vector3(-1, 0, 0);
+            static readonly right = new Vector3(1, 0, 0);
+            static readonly forward = new Vector3(0, 0, 1);
+            static readonly back = new Vector3(0, 0, -1);
+
+            // ------------------------
+            // Static helpers
+            // ------------------------
+            static fromAngle(theta: number, phi: number, length: number = 1): Vector3 {
+                const sinPhi = Math.sin(phi);
+                return new Vector3(
+                    Math.cos(theta) * sinPhi * length,
+                    Math.sin(theta) * sinPhi * length,
+                    Math.cos(phi) * length
+                );
+            }
+
+            static lerp(a: Vector3, b: Vector3, t: number): Vector3 {
+                return new Vector3(
+                    a.x + (b.x - a.x) * t,
+                    a.y + (b.y - a.y) * t,
+                    a.z + (b.z - a.z) * t
+                );
+            }
+
+            static distance(a: Vector3, b: Vector3): number {
+                return a.sub(b).magnitude();
+            }
+
+            static dot(a: Vector3, b: Vector3): number {
+                return a.dot(b);
+            }
         }
 
-        mul(v: Vector2 | number): Vector2 {
-            if (v instanceof Vector2)
-                return new Vector2(this.x * v.x, this.y * v.y);
+        export const lerp = (a: number, b: number, t: number): number => a + (b - a) * t;
 
-            return new Vector2(this.x * v, this.y * v);
-        }
-
-        div(v: Vector2 | number): Vector2 {
-            if (v instanceof Vector2)
-                return new Vector2(this.x / v.x, this.y / v.y);
-
-            return new Vector2(this.x / v, this.y / v);
-        }
-    
-        // ------------------------
-        // Maginute & normalization
-        // ------------------------
-        magnitude(): number {
-            return Math.sqrt(this.x * this.x + this.y * this.y);
-        }
-
-        magnitudeSqr(): number {
-            return this.x * this.x + this.y * this.y;
-        }
-
-        normalize(): Vector2 {
-            const mag = this.magnitude();
-            return mag === 0 ? new Vector2(0, 0) : this.div(mag);
-        }
-
-        normalized(): Vector2 {
-            return this.normalize();
-        }
-
-        // ------------------------
-        // Dot / Cross products
-        // ------------------------
-        dot(v: Vector2): number {
-            return this.x * v.x + this.y * v.y;
-        }
-
-        cross(v: Vector2): number {
-            return this.x * v.y - this.y * v.x;
-        }
-
-        // ------------------------
-        // Angle
-        // ------------------------
-        angle(): number {
-            return Math.atan2(this.y, this.x);
-        }
-
-        angleTo(v: Vector2): number {
-            return Math.atan2(v.y - this.y, v.x - this.x);
-        }
-
-        // ------------------------
-        // Utility
-        // ------------------------
-        copy(): Vector2 {
-            return new Vector2(this.x, this.y);
-        }
-
-        equals(v: Vector2): boolean {
-            return this.x === this.y && this.y === v.y;
-        }
-
-        toString(): string {
-            return `X: ${this.x}, Y: ${this.y}`;
-        }
-
-        // ------------------------
-        // Static constants
-        // ------------------------
-        static readonly zero = new Vector2(0, 0);
-        static readonly one = new Vector2(1, 1);
-        static readonly up = new Vector2(0, -1);
-        static readonly down = new Vector2(0, 1);
-        static readonly left = new Vector2(-1, 0);
-        static readonly right = new Vector2(1, 0);
-
-        // ------------------------
-        // Static helpers
-        // ------------------------
-        static fromAngle(angle: number, length: number = 1): Vector2 {
-            return new Vector2(Math.cos(angle) * length, Math.sin(angle) * length);
-        }
-
-        static lerp(a: Vector2, b: Vector2, t: number): Vector2 {
-            return new Vector2(
-                a.x + (b.x - a.x) * t,
-                a.y + (b.y - a.y) * t
-            );
-        }
-
-        static distance(a: Vector2, b: Vector2): number {
-            return a.sub(b).magnitude();
-        }
-
-        static dot(a: Vector2, b: Vector2): number {
-            return a.dot(b);
-        }
+        export const clamp = (value: number, min: number, max: number): number => Math.max(min, Math.min(max, value));
+        
     }
 
     export class Rect {
@@ -197,6 +342,7 @@ export namespace BlitJS {
         image: HTMLImageElement | null = null;
         
         private _rect: Rect;
+        private _colorkey: Color | null = null;
 
         constructor(size: [number, number]) {
             this.size = size;
@@ -236,6 +382,63 @@ export namespace BlitJS {
             }
             return this._rect;
         }
+
+        getAt(pos: [number, number]): [number, number, number, number] {
+            const id = this.ctx.getImageData(pos[0], pos[1], 1, 1);
+            const d = id.data;
+            return [d[0], d[1], d[2], d[3]];
+        }
+
+        setAt(pos: [number, number], color: string | [number, number, number] | [number, number, number, number]) {
+            let r: number, g: number, b: number, a: number = 255;
+            if (typeof color === 'string') {
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = 1;
+                tempCanvas.height = 1;
+                const tempCtx = tempCanvas.getContext('2d')!;
+                tempCtx.fillStyle = color;
+                tempCtx.fillRect(0, 0, 1, 1);
+                const data = tempCtx.getImageData(0, 0, 1, 1).data;
+                r = data[0];
+                g = data[1];
+                b = data[2];
+                a = data[3];
+            } else if (color.length === 3) {
+                [r, g, b] = color;
+            } else if (color.length === 4) {
+                [r, g, b, a] = color;
+            } else {
+                throw new Error("Invalid color format");
+            }
+            const id = this.ctx.createImageData(1, 1);
+            id.data[0] = r;
+            id.data[1] = g;
+            id.data[2] = b;
+            id.data[3] = a;
+            this.ctx.putImageData(id, pos[0], pos[1]);
+        }
+
+        setColorKey(color: Color | null = null): void {
+            this._colorkey = color;
+            if (color !== null) {
+                const id = this.ctx.getImageData(0, 0, this.size[0], this.size[1]);
+                const d = id.data;
+                const r = color.r ?? 0;
+                const g = color.g ?? 0;
+                const b = color.b ?? 0;
+                for (let i = 0; i < d.length; i += 4) {
+                    if (d[i] === r && d[i + 1] === g && d[i + 2] === b) {
+                        d[i + 3] = 0;
+                    }
+                }
+                this.ctx.putImageData(id, 0, 0);
+            }
+            // Note: Setting to null disables colorkey but does not restore original alphas
+        }
+
+        getColorKey(): Color | null {
+            return this._colorkey;
+        }
     }
 
     export namespace image {
@@ -259,6 +462,7 @@ export namespace BlitJS {
 
     export namespace transform {
 
+        // Returns new scaled surface
         export const scale = (surf: Surface, size: [number, number]): Surface => {
             const scaled = new Surface(size);
             scaled.ctx.imageSmoothingEnabled = false;
@@ -266,6 +470,7 @@ export namespace BlitJS {
             return scaled;
         }
 
+        // Returns new rotated surface
         export const rotate = (surf: Surface, angle: number): Surface => {
             const rad = angle * Math.PI / 180;
             const w = surf.size[0];
@@ -285,6 +490,7 @@ export namespace BlitJS {
             return rotated;
         }
 
+        // Returns new flipped surface
         export const flip = (surf: Surface, flip: [boolean, boolean]): Surface => {
             const w = surf.size[0];
             const h = surf.size[1];
@@ -586,6 +792,120 @@ export namespace BlitJS {
 
     }
 
+    export namespace mask {
+
+        export class Mask {
+            private _width: number;
+            private _height: number;
+            private _data: Uint8Array;
+
+            constructor(width: number, height: number) {
+                this._width = width;
+                this._height = height;
+                this._data = new Uint8Array(width * height);
+            }
+
+            getSize(): [number, number] {
+                return [this._width, this._height];
+            }
+
+            getAt(x: number, y: number): boolean {
+                if (x < 0 || x >= this._width || y < 0 || y >= this._height) {
+                    throw new Error("Index out of bounds");
+                }
+                return this._data[y * this._width + x] === 1;
+            }
+
+            setAt(x: number, y: number, value: boolean) {
+                if (x < 0 || x >= this._width || y < 0 || y >= this._height) {
+                    throw new Error("Index out of bounds");
+                }
+                this._data[y * this._width + x] = value ? 1 : 0;
+            }
+
+            count(): number {
+                return this._data.reduce((acc, val) => acc + val, 0);
+            }
+
+            overlap(other: Mask, offset: [number, number]): [number, number] | null {
+                const ox = Math.floor(offset[0]);
+                const oy = Math.floor(offset[1]);
+
+                const x0 = Math.max(0, ox);
+                const y0 = Math.max(0, oy);
+                const x1 = Math.min(this._width, ox + other._width);
+                const y1 = Math.min(this._height, oy + other._height);
+
+                if (x0 >= x1 || y0 >= y1) {
+                    return null;
+                }
+
+                for (let y = y0; y < y1; y++) {
+                    for (let x = x0; x < x1; x++) {
+                        const thisVal = this.getAt(x, y);
+                        const otherX = x - ox;
+                        const otherY = y - oy;
+                        const otherVal = other.getAt(otherX, otherY);
+
+                        if (thisVal && otherVal) {
+                            return [x, y];
+                        }
+                    }
+                }
+
+                return null;
+            }
+
+            fill() {
+                this._data.fill(1);
+            }
+
+            clear() {
+                this._data.fill(0);
+            }
+        }
+
+        export const fromSurface = (surf: Surface, threshold: number = 127): Mask => {
+            const [w, h] = surf.size;
+            const m = new Mask(w, h);
+            const imageData = surf.ctx.getImageData(0, 0, w, h);
+            const pixels = imageData.data;
+
+            for (let i = 0; i < pixels.length; i += 4) {
+                const alpha = pixels[i + 3];
+                if (alpha > threshold) {
+                    const px = (i / 4) % w;
+                    const py = Math.floor((i / 4) / w);
+                    m.setAt(px, py, true);
+                }
+            }
+
+            return m;
+        }
+
+        export const toSurface = (mask: Mask, setcolor: Color = { r: 255, g: 255, b: 255, a: 1 }, unsetcolor: Color = { r: 0, g: 0, b: 0, a: 1 }): Surface => {
+            const [w, h] = mask.getSize();
+            const surf = new Surface([w, h]);
+            const id = surf.ctx.createImageData(w, h);
+            const d = id.data;
+
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
+                    const idx = (y * w + x) * 4;
+                    const col = mask.getAt(x, y) ? setcolor : unsetcolor;
+                    d[idx] = col.r ?? 0;
+                    d[idx + 1] = col.g ?? 0;
+                    d[idx + 2] = col.b ?? 0;
+                    d[idx + 3] = Math.round((col.a ?? 1) * 255);
+                }
+            }
+
+            surf.ctx.putImageData(id, 0, 0);
+            return surf;
+        }
+
+    }
+
     export namespace display {
 
         class Display
@@ -655,21 +975,33 @@ export namespace BlitJS {
             private _rawDelta = 0;
             private _delta = 0;
 
-            private _fps = 0;
-            private _smoothing = 0.9;
+            private _times: number[] = [];
 
             private _maxDeltaMs = 250;
-        
-            tick(): number {
-                const now = performance.now();
+
+            tick(fps: number = 0): number {
+                let now = performance.now();
                 this._rawDelta = now - this._last;
+                this._delta = this._rawDelta;
 
-                this._delta = Math.min(this._rawDelta, this._maxDeltaMs);
+                if (fps > 0) {
+                    const target = 1000 / fps;
+                    const delay = target - this._delta;
+                    if (delay > 0) {
+                        const start = performance.now();
+                        while (performance.now() - start < delay) {}
+                    }
+                    now = performance.now();
+                    this._delta = now - this._last;
+                    this._rawDelta = this._delta;
+                }
 
-                const instFps = 1000 / (this._delta || 1);
-                this._fps = this._fps
-                ? this._smoothing * this._fps + (1 - this._smoothing) * instFps
-                : instFps;
+                this._delta = Math.min(this._delta, this._maxDeltaMs);
+
+                this._times.push(this._delta);
+                if (this._times.length > 10) {
+                    this._times.shift();
+                }
 
                 this._last = now;
                 return this._delta;
@@ -687,7 +1019,9 @@ export namespace BlitJS {
             }
 
             getFPS(): number {
-                return this._fps;
+                if (this._times.length === 0) return 0;
+                const avg = this._times.reduce((a, b) => a + b, 0) / this._times.length;
+                return 1000 / avg;
             }
         }
     }
@@ -708,10 +1042,12 @@ export namespace BlitJS {
             _pos[1] = (e.clientY - rect.top) * scaleY;
         });
         
+        // Get current mouse position
         export const getPos = (): [number, number] => {
             return [..._pos];
         }
 
+        // Get amount of mouse movement
         export const getRel = (): [number, number] => {
             const deltaX = _pos[0] - _lastPos[0]; 
             const deltaY = _pos[1] - _lastPos[1];
@@ -721,12 +1057,14 @@ export namespace BlitJS {
             return [deltaX, deltaY]; 
         }
 
+        // Set cursor visiblity
         export const setVisible = (visible: boolean) => {
             if (display.display) {
                 display.display.cursorVisible = visible;
             }
         }
 
+        // Get cursor visiblity
         export const getVisible = (): boolean => {
             if (display.display)
                 return display.display?.cursorVisible;
@@ -822,7 +1160,9 @@ export namespace BlitJS {
             KeyDown,
             KeyUp,
             MouseDown,
-            MouseUp
+            MouseUp,
+            WindowFocusGained,
+            WindowFocusLost
         }
 
         export interface Event {
@@ -850,6 +1190,8 @@ export namespace BlitJS {
         window.addEventListener("mousedown", (e) => eventQueue.push({ type: EventType.MouseDown, button: e.button as Buttons }));
         window.addEventListener("mouseup", (e) => eventQueue.push({ type: EventType.MouseUp, button: e.button as Buttons }));
         window.addEventListener("contextmenu", (e) => e.preventDefault());
+        window.addEventListener("blur", () => eventQueue.push({ type: EventType.WindowFocusLost }))
+        window.addEventListener("focus", () => eventQueue.push({ type: EventType.WindowFocusGained }))
 
         // Get all current events
         export const get = () => {

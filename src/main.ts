@@ -10,18 +10,37 @@ blueBox.fill('blue');
 
 const playerSurf = await BlitJS.image.load("./images/player.png");
 const playerRect = playerSurf.getRect([200, 100]);
+const playerMask = BlitJS.mask.fromSurface(playerSurf);
+
+const newPlayerSurf = BlitJS.mask.toSurface(playerMask);
+newPlayerSurf.setColorKey({ r: 0, g: 0, b: 0, a: 1 })
+
+const surfSize = newPlayerSurf.size;
+for (let x = 0; x < surfSize[0]; x++) {
+    for (let y = 0; y < surfSize[1]; y++) {
+        if (newPlayerSurf.getAt([x, y])[0] != 0) {
+            newPlayerSurf.setAt([x, y], [255, 255, 255, 255]);
+        }
+    }
+}
 
 const testFont = new BlitJS.font.Font("MedodicaRegular", 128);
 
 const jumpSfx = new BlitJS.audio.Sound("./sfx/jump.wav");
 const music = new BlitJS.audio.Music("./music/rosalia.mp3");
 
+const vec2 = new BlitJS.math.Vector2(10, 20);
+const vec3 = new BlitJS.math.Vector3(20, 30, 64);
+
+console.log(vec2);
+console.log(vec3);
+
 let movement = [false, false];
 let flip: boolean = false;
 let rot = 0;
 
 const loop = () => {
-    clock.tick();
+    clock.tick(60);
 
     display.fill('green');
 
@@ -49,6 +68,12 @@ const loop = () => {
                 BlitJS.mouse.setVisible(false)
             if (e.button == BlitJS.Buttons.Left)
                 BlitJS.mouse.setVisible(true)
+        }
+        if (e.type == BlitJS.event.EventType.WindowFocusLost) {
+            console.log("focus is lost");
+        }
+        if (e.type == BlitJS.event.EventType.WindowFocusGained) {
+            console.log("focus is gained");
         }
     }
 
@@ -83,8 +108,22 @@ const loop = () => {
     let blueBoxCopy = BlitJS.transform.rotate(blueBox, rot);
     display.blit(blueBoxCopy, [blueBoxRect.pos[0] - blueBoxCopy.size[0] / 2, blueBoxRect.pos[1] - blueBoxCopy.size[1] / 2]);
 
+    let offset = 1;
+
+    const newPlayerSurfFlipped = BlitJS.transform.flip(newPlayerSurf, [flip, false]);
+
+    // Outline
+    display.blit(newPlayerSurfFlipped, [playerRect.pos[0] + offset, playerRect.pos[1]]);
+    display.blit(newPlayerSurfFlipped, [playerRect.pos[0] - offset, playerRect.pos[1]]);
+    display.blit(newPlayerSurfFlipped, [playerRect.pos[0], playerRect.pos[1] + offset]);
+    display.blit(newPlayerSurfFlipped, [playerRect.pos[0], playerRect.pos[1] - offset]);
+    display.blit(newPlayerSurfFlipped, [playerRect.pos[0] + offset, playerRect.pos[1] - offset]);
+    display.blit(newPlayerSurfFlipped, [playerRect.pos[0] + offset, playerRect.pos[1] + offset]);
+    display.blit(newPlayerSurfFlipped, [playerRect.pos[0] - offset, playerRect.pos[1] + offset]);
+    display.blit(newPlayerSurfFlipped, [playerRect.pos[0] - offset, playerRect.pos[1] - offset]);
+
     display.blit(BlitJS.transform.flip(playerSurf, [flip, false]), playerRect.pos);
-    
+
     screen.blit(BlitJS.transform.scale(display, BlitJS.display.getSize()), [0, 0]);
     //screen.blit(display, [0, 0]);
     
