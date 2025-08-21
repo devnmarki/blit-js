@@ -266,6 +266,25 @@ export namespace BlitJS {
             return scaled;
         }
 
+        export const rotate = (surf: Surface, angle: number): Surface => {
+            const rad = angle * Math.PI / 180;
+            const w = surf.size[0];
+            const h = surf.size[1];
+            const cos = Math.abs(Math.cos(rad));
+            const sin = Math.abs(Math.sin(rad));
+            const newW = Math.ceil(w * cos + h * sin);
+            const newH = Math.ceil(w * sin + h * cos);
+
+            const rotated = new Surface([newW, newH]);
+
+            rotated.ctx.imageSmoothingEnabled = false;
+            rotated.ctx.translate(newW / 2, newH / 2);
+            rotated.ctx.rotate(rad);
+            rotated.ctx.drawImage(surf.canvas, -w / 2, -h / 2);
+            
+            return rotated;
+        }
+
         export const flip = (surf: Surface, flip: [boolean, boolean]): Surface => {
             const w = surf.size[0];
             const h = surf.size[1];
