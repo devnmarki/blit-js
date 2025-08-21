@@ -356,9 +356,9 @@ export namespace BlitJS {
         // ------------------------
         // Rendering
         // ------------------------
-        fill(color: string = "black"): void {
+        fill(color: Color): void {
             this.ctx.save();
-            this.ctx.fillStyle = color;
+            this.ctx.fillStyle = `rgba(${color.r ?? 0}, ${color.g ?? 0}, ${color.b ?? 0}, ${color.a ?? 1})`;
             this.ctx.fillRect(0, 0, this.size[0], this.size[1]);
             this.ctx.restore();
         }
@@ -926,7 +926,7 @@ export namespace BlitJS {
             // ------------------------
             // Render with display surface
             // ------------------------
-            fill(color: string = "black") {
+            fill(color: Color) {
                 this.surface.fill(color);
             }
 
