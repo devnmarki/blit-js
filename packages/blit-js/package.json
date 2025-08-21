@@ -1,6 +1,6 @@
 {
   "name": "blit-js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Pygame-like web game development framework",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -17,7 +17,7 @@
   ],
   "author": "Marko Smiljic",
   "license": "MIT",
-  "type": "commonjs",
+  "type": "module",
   "devDependencies": {
     "tsup": "^8.5.0",
     "typescript": "^5.9.2"
