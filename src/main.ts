@@ -11,6 +11,11 @@ blueBox.fill('blue');
 const playerSurf = await BlitJS.image.load("./images/player.png");
 const playerRect = playerSurf.getRect([200, 100]);
 
+const testFont = new BlitJS.font.Font("MedodicaRegular", 128);
+
+const jumpSfx = new BlitJS.audio.Sound("./sfx/jump.wav");
+const music = new BlitJS.audio.Music("./music/rosalia.mp3");
+
 let movement = [false, false];
 let flip: boolean = false;
 
@@ -20,13 +25,19 @@ const loop = () => {
     display.fill('green');
 
     for (const e of BlitJS.event.get()) {
-        if (e.type == BlitJS.event.EventType.KEYDOWN) {
+        if (e.type == BlitJS.event.EventType.KeyDown) {
             if (e.key == BlitJS.Keys.A)
                 movement[0] = true;
             if (e.key == BlitJS.Keys.D)
                 movement[1] = true;
+            if (e.key == BlitJS.Keys.Space)
+                jumpSfx.play();
+            if (e.key == BlitJS.Keys.O)
+                music.play(true);
+            if (e.key == BlitJS.Keys.P)
+                music.pause();
         }
-        if (e.type == BlitJS.event.EventType.KEYUP) {
+        if (e.type == BlitJS.event.EventType.KeyUp) {
             if (e.key == BlitJS.Keys.A)
                 movement[0] = false;
             if (e.key == BlitJS.Keys.D)
@@ -57,13 +68,16 @@ const loop = () => {
     BlitJS.draw.arc(display, [100, 100], 50, 0, Math.PI, { r: 255, g: 0, b: 0, a: 1 }, 2);
     BlitJS.draw.ellipse(display, [200, 200], [80, 40], 0, 0, 2 * Math.PI, { r: 0, g: 255, b: 0, a: 1 }, 3);
     BlitJS.draw.fillEllipse(display, [150, 150],[ 60, 30], 0, 0, 2 * Math.PI, { r: 0, g: 0, b: 255, a: 1 });
+
+    let textSurf = testFont.render("Hello, World!");
     
     display.blit(blueBox, blueBoxRect.pos);
     display.blit(BlitJS.transform.flip(playerSurf, [flip, false]), playerRect.pos);
     
     screen.blit(BlitJS.transform.scale(display, BlitJS.display.getSize()), [0, 0]);
-    
     //screen.blit(display, [0, 0]);
+    
+    screen.blit(textSurf, [200, 200]);
 
     screen.update();
 

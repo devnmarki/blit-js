@@ -7,6 +7,130 @@ export namespace BlitJS {
         a?: number
     }
 
+    export class Vector2 {
+        constructor(public x: number, public y: number) { }
+
+        // ------------------------
+        // Basic operations
+        // ------------------------
+        add(v: Vector2 | number): Vector2 {
+            if (v instanceof Vector2)
+                return new Vector2(this.x + v.x, this.y + v.y);
+
+            return new Vector2(this.x + v, this.y + v);
+        }
+
+        sub(v: Vector2 | number): Vector2 {
+            if (v instanceof Vector2)
+                return new Vector2(this.x - v.x, this.y - v.y);
+
+            return new Vector2(this.x - v, this.y - v);
+        }
+
+        mul(v: Vector2 | number): Vector2 {
+            if (v instanceof Vector2)
+                return new Vector2(this.x * v.x, this.y * v.y);
+
+            return new Vector2(this.x * v, this.y * v);
+        }
+
+        div(v: Vector2 | number): Vector2 {
+            if (v instanceof Vector2)
+                return new Vector2(this.x / v.x, this.y / v.y);
+
+            return new Vector2(this.x / v, this.y / v);
+        }
+    
+        // ------------------------
+        // Maginute & normalization
+        // ------------------------
+        magnitude(): number {
+            return Math.sqrt(this.x * this.x + this.y * this.y);
+        }
+
+        magnitudeSqr(): number {
+            return this.x * this.x + this.y * this.y;
+        }
+
+        normalize(): Vector2 {
+            const mag = this.magnitude();
+            return mag === 0 ? new Vector2(0, 0) : this.div(mag);
+        }
+
+        normalized(): Vector2 {
+            return this.normalize();
+        }
+
+        // ------------------------
+        // Dot / Cross products
+        // ------------------------
+        dot(v: Vector2): number {
+            return this.x * v.x + this.y * v.y;
+        }
+
+        cross(v: Vector2): number {
+            return this.x * v.y - this.y * v.x;
+        }
+
+        // ------------------------
+        // Angle
+        // ------------------------
+        angle(): number {
+            return Math.atan2(this.y, this.x);
+        }
+
+        angleTo(v: Vector2): number {
+            return Math.atan2(v.y - this.y, v.x - this.x);
+        }
+
+        // ------------------------
+        // Utility
+        // ------------------------
+        copy(): Vector2 {
+            return new Vector2(this.x, this.y);
+        }
+
+        equals(v: Vector2): boolean {
+            return this.x === this.y && this.y === v.y;
+        }
+
+        toString(): string {
+            return `X: ${this.x}, Y: ${this.y}`;
+        }
+
+        // ------------------------
+        // Static constants
+        // ------------------------
+        static readonly zero = new Vector2(0, 0);
+        static readonly one = new Vector2(1, 1);
+        static readonly up = new Vector2(0, -1);
+        static readonly down = new Vector2(0, 1);
+        static readonly left = new Vector2(-1, 0);
+        static readonly right = new Vector2(1, 0);
+
+        // ------------------------
+        // Static helpers
+        // ------------------------
+        static fromAngle(angle: number, length: number = 1): Vector2 {
+            return new Vector2(Math.cos(angle) * length, Math.sin(angle) * length);
+        }
+
+        static lerp(a: Vector2, b: Vector2, t: number): Vector2 {
+            return new Vector2(
+                a.x + (b.x - a.x) * t,
+                a.y + (b.y - a.y) * t
+            );
+        }
+
+        static distance(a: Vector2, b: Vector2): number {
+            return a.sub(b).magnitude();
+        }
+
+        static dot(a: Vector2, b: Vector2): number {
+            return a.dot(b);
+        }
+    }
+
     export class Rect {
         private _x: number;
         private _y: number;
@@ -24,6 +148,9 @@ export namespace BlitJS {
             return new Rect([this._x, this._y], [this._w, this._h]);
         }
 
+        // ------------------------
+        // Collision detection
+        // ------------------------
         colliderect(other: Rect): boolean {
             return !(this.left > other.right || this.right < other.left || this.bottom < other.top || this.top > other.bottom)
         }
@@ -32,6 +159,9 @@ export namespace BlitJS {
             return point[0] >= this.left && point[0] <= this.right && point[1] >= this.top && point[1] <= this.bottom;
         }
 
+        // ------------------------
+        // Getters & setters
+        // ------------------------
         get width() { return this._w; }
         set width(value: number) { this._w = value; }
 
@@ -75,6 +205,9 @@ export namespace BlitJS {
             this._rect = new Rect([0, 0], size);
         }
 
+        // ------------------------
+        // Rendering
+        // ------------------------
         fill(color: string = "black"): void {
             this.ctx.save();
             this.ctx.fillStyle = color;
@@ -88,10 +221,14 @@ export namespace BlitJS {
             this.ctx.drawImage(surface.canvas, this._rect.x, this._rect.y);
         }
 
+        // ------------------------
+        // Utility
+        // ------------------------
         copy(): Surface {
             return new Surface(this.size);
         }
 
+        // Get rect from surface
         getRect(pos?: [number, number]) { 
             if (pos) {
                 this._rect.x = pos[0];
@@ -103,6 +240,7 @@ export namespace BlitJS {
 
     export namespace image {
 
+        // Load image and display loading error
         export const load = (filename: string): Promise<Surface> => {
             return new Promise((res, rej) => {
                 const imageElement = new Image();
@@ -145,6 +283,9 @@ export namespace BlitJS {
 
     export namespace draw {
 
+        // ------------------------
+        // Draw stroke and filled rect
+        // ------------------------
         export const rect = (
             surface: Surface, 
             rect: Rect, 
@@ -169,6 +310,9 @@ export namespace BlitJS {
             surface.ctx.restore();
         }
 
+        // ------------------------
+        // Draw stroke and filled circle
+        // ------------------------
         export const circle = (
             surface: Surface, 
             pos: [number, number], 
@@ -199,6 +343,9 @@ export namespace BlitJS {
             surface.ctx.restore();
         }
 
+        // ------------------------
+        // Draw line and arc
+        // ------------------------
         export const line = (
             surface: Surface,
             start: [number, number],
@@ -234,7 +381,9 @@ export namespace BlitJS {
             surface.ctx.restore();
         };
 
-
+        // ------------------------
+        // Draw stroke and filled ellipse
+        // ------------------------
         export const ellipse = (
             surface: Surface,
             pos: [number, number],
@@ -272,6 +421,152 @@ export namespace BlitJS {
         };
     }
 
+    export namespace font {
+
+        export class Font {
+            private font: string;
+
+            constructor(font: string | null, size: number) {
+                this.font = `${size}px ${font ?? "Arial"}`;
+            }
+
+            // Returns text as new surface
+            render(text: string, color: Color = { r: 255, g: 255, b: 255, a: 1 }) : Surface {
+                // Create temporary canvas
+                const tempCanvas = document.createElement("canvas");
+                const tempCtx = tempCanvas.getContext("2d") as CanvasRenderingContext2D;
+                tempCtx.font = this.font;
+
+                // Measure size of the temporary canvas
+                const metrics = tempCtx.measureText(text);
+                const width = Math.ceil(metrics.width);
+
+                // Make sure that text is not cut off
+                const fontSizeMatch = this.font.match(/(\d+)px/);
+                const fontSize = fontSizeMatch ? parseInt(fontSizeMatch[1], 10) : 16;
+                const height = fontSize * 1.3;
+
+                // Create text surface
+                const surf = new Surface([width, height]);
+
+                // Apply style to the text surface
+                surf.ctx.imageSmoothingEnabled = true;
+                surf.ctx.font = this.font;
+                surf.ctx.fillStyle = `rgba(${color.r ?? 0}, ${color.g ?? 0}, ${color.b ?? 0}, ${color.a ?? 1})`;
+                surf.ctx.textBaseline = "alphabetic";
+                surf.ctx.fillText(text, 0, fontSize); 
+
+                return surf;
+            }
+        }
+
+    }
+
+    export namespace audio {
+
+        export class Sound {
+            private _filename: string;
+            private _players: SoundPlayer[] = [];
+
+            constructor(filename: string) {
+                this._filename = filename;
+            }
+
+            play(): SoundPlayer {
+                const player = new SoundPlayer(this._filename);
+                this._players.push(player);
+                player.play();
+
+                player.audio.onended = () => {
+                    this._players = this._players.filter(p => p !== player);
+                }
+
+                return player;
+            }
+
+            stop() {
+                this._players.forEach(p => p.stop());
+                this._players = [];
+            }
+
+            pause() {
+                this._players.forEach(p => p.pause());
+            }
+        }
+
+
+        class SoundPlayer {
+            public audio: HTMLAudioElement;
+
+            constructor(filename: string) {
+                this.audio = new Audio(filename);
+                this.audio.load();
+                this.audio.loop = false;
+            }
+
+            play() {
+                this.audio.play();
+            }
+
+            pause() {
+                this.audio.pause();
+            }
+
+            stop() {
+                this.audio.pause();
+                this.audio.currentTime = 0;
+            }
+
+            set volume(volume: number) { 
+                this.audio.volume = volume;
+            }
+
+            get volume() {
+                return this.audio.volume;
+            }
+
+            get duration() {
+                return this.audio.duration;
+            }
+        }
+
+        export class Music {
+            private _audio: HTMLAudioElement;
+
+            constructor(filename: string) {
+                this._audio = new Audio(filename);
+                this._audio.load();
+            }
+
+            play(loop: boolean = true) {
+                this._audio.loop = loop;
+                this._audio.play();
+            }
+
+            pause() {
+                this._audio.pause();
+            }
+
+            stop() {
+                this._audio.pause();
+                this._audio.currentTime = 0;
+            }
+
+            set volume(volume: number) { 
+                this._audio.volume = volume;
+            }
+
+            get volume() {
+                return this._audio.volume;
+            }
+
+            get duration() {
+                return this._audio.duration;
+            }
+        }
+
+    }
+
     export namespace display {
 
         class Display
@@ -286,6 +581,9 @@ export namespace BlitJS {
                 this.surface = new Surface([this.canvas.width, this.canvas.height]);
             }
 
+            // ------------------------
+            // Render with display surface
+            // ------------------------
             fill(color: string = "black") {
                 this.surface.fill(color);
             }
@@ -294,6 +592,7 @@ export namespace BlitJS {
                 this.surface.blit(surf, pos);
             }
 
+            // Update display canvas
             update(): void {
                 this.ctx.drawImage(this.surface.canvas, 0, 0);
             }
@@ -301,11 +600,15 @@ export namespace BlitJS {
         
         let display: Display | null = null;
 
+        // Returns new display with given size
         export const setMode = (size: [number, number]): Display => {
             display = new Display(size);
             return display;
         }
 
+        // ------------------------
+        // Display properties
+        // ------------------------
         export const getSurface = (): Surface | null => {
             return display ? display.surface : null;
         }
@@ -335,7 +638,7 @@ export namespace BlitJS {
             private _smoothing = 0.9;
 
             private _maxDeltaMs = 250;
-
+        
             tick(): number {
                 const now = performance.now();
                 this._rawDelta = now - this._last;
@@ -351,6 +654,9 @@ export namespace BlitJS {
                 return this._delta;
             }
 
+            // ------------------------
+            // Getters
+            // ------------------------
             getTime(): number {
                 return this._delta;
             }
@@ -369,6 +675,7 @@ export namespace BlitJS {
         
         let _pos: [number, number] = [0, 0];
         
+        // Calculate mouse position when moving mouse
         const canvas = document.getElementById('canvas') as HTMLCanvasElement;
         canvas.addEventListener("mousemove", (e) => {
             const rect = canvas.getBoundingClientRect();
@@ -468,10 +775,10 @@ export namespace BlitJS {
 
     export namespace event {
         export enum EventType {
-            KEYDOWN,
-            KEYUP,
-            MOUSEDOWN,
-            MOUSEUP
+            KeyDown,
+            KeyUp,
+            MouseDown,
+            MouseUp
         }
 
         export interface Event {
@@ -483,20 +790,24 @@ export namespace BlitJS {
         const eventQueue: Event[] = [];
         const pressedKeys = new Set<string>();
 
+        // ------------------------
+        // Events
+        // ------------------------
         window.addEventListener("keydown", (e) => {
             if (!pressedKeys.has(e.key)) {
                 pressedKeys.add(e.key);
-                eventQueue.push({ type: EventType.KEYDOWN, key: e.key as Keys })
+                eventQueue.push({ type: EventType.KeyDown, key: e.key as Keys })
             }
         });
         window.addEventListener("keyup", (e) => {
             pressedKeys.delete(e.key);
-            eventQueue.push({ type: EventType.KEYUP, key: e.key as Keys })
+            eventQueue.push({ type: EventType.KeyUp, key: e.key as Keys })
         });
-        window.addEventListener("mousedown", (e) => eventQueue.push({ type: EventType.MOUSEDOWN, button: e.button as Buttons }));
-        window.addEventListener("mouseup", (e) => eventQueue.push({ type: EventType.MOUSEUP, button: e.button as Buttons }));
+        window.addEventListener("mousedown", (e) => eventQueue.push({ type: EventType.MouseDown, button: e.button as Buttons }));
+        window.addEventListener("mouseup", (e) => eventQueue.push({ type: EventType.MouseUp, button: e.button as Buttons }));
         window.addEventListener("contextmenu", (e) => e.preventDefault());
 
+        // Get all current events
         export const get = () => {
             const events = [...eventQueue];
             eventQueue.length = 0;
