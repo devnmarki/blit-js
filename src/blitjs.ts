@@ -1146,7 +1146,9 @@ export namespace BlitJS {
             KeyDown,
             KeyUp,
             MouseDown,
-            MouseUp
+            MouseUp,
+            WindowFocusGained,
+            WindowFocusLost
         }
 
         export interface Event {
@@ -1174,6 +1176,8 @@ export namespace BlitJS {
         window.addEventListener("mousedown", (e) => eventQueue.push({ type: EventType.MouseDown, button: e.button as Buttons }));
         window.addEventListener("mouseup", (e) => eventQueue.push({ type: EventType.MouseUp, button: e.button as Buttons }));
         window.addEventListener("contextmenu", (e) => e.preventDefault());
+        window.addEventListener("blur", () => eventQueue.push({ type: EventType.WindowFocusLost }))
+        window.addEventListener("focus", () => eventQueue.push({ type: EventType.WindowFocusGained }))
 
         // Get all current events
         export const get = () => {

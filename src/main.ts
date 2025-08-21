@@ -69,6 +69,12 @@ const loop = () => {
             if (e.button == BlitJS.Buttons.Left)
                 BlitJS.mouse.setVisible(true)
         }
+        if (e.type == BlitJS.event.EventType.WindowFocusLost) {
+            console.log("focus is lost");
+        }
+        if (e.type == BlitJS.event.EventType.WindowFocusGained) {
+            console.log("focus is gained");
+        }
     }
 
     let frameMovement: number = (Number(movement[1]) - Number(movement[0]));
@@ -104,15 +110,17 @@ const loop = () => {
 
     let offset = 1;
 
+    const newPlayerSurfFlipped = BlitJS.transform.flip(newPlayerSurf, [flip, false]);
+
     // Outline
-    display.blit(newPlayerSurf, [playerRect.pos[0] + offset, playerRect.pos[1]]);
-    display.blit(newPlayerSurf, [playerRect.pos[0] - offset, playerRect.pos[1]]);
-    display.blit(newPlayerSurf, [playerRect.pos[0], playerRect.pos[1] + offset]);
-    display.blit(newPlayerSurf, [playerRect.pos[0], playerRect.pos[1] - offset]);
-    display.blit(newPlayerSurf, [playerRect.pos[0] + offset, playerRect.pos[1] - offset]);
-    display.blit(newPlayerSurf, [playerRect.pos[0] + offset, playerRect.pos[1] + offset]);
-    display.blit(newPlayerSurf, [playerRect.pos[0] - offset, playerRect.pos[1] + offset]);
-    display.blit(newPlayerSurf, [playerRect.pos[0] - offset, playerRect.pos[1] - offset]);
+    display.blit(newPlayerSurfFlipped, [playerRect.pos[0] + offset, playerRect.pos[1]]);
+    display.blit(newPlayerSurfFlipped, [playerRect.pos[0] - offset, playerRect.pos[1]]);
+    display.blit(newPlayerSurfFlipped, [playerRect.pos[0], playerRect.pos[1] + offset]);
+    display.blit(newPlayerSurfFlipped, [playerRect.pos[0], playerRect.pos[1] - offset]);
+    display.blit(newPlayerSurfFlipped, [playerRect.pos[0] + offset, playerRect.pos[1] - offset]);
+    display.blit(newPlayerSurfFlipped, [playerRect.pos[0] + offset, playerRect.pos[1] + offset]);
+    display.blit(newPlayerSurfFlipped, [playerRect.pos[0] - offset, playerRect.pos[1] + offset]);
+    display.blit(newPlayerSurfFlipped, [playerRect.pos[0] - offset, playerRect.pos[1] - offset]);
 
     display.blit(BlitJS.transform.flip(playerSurf, [flip, false]), playerRect.pos);
 
