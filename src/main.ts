@@ -40,7 +40,7 @@ let flip: boolean = false;
 let rot = 0;
 
 const loop = () => {
-    clock.tick();
+    clock.tick(60);
 
     display.fill('green');
 

@@ -975,21 +975,33 @@ export namespace BlitJS {
             private _rawDelta = 0;
             private _delta = 0;
 
-            private _fps = 0;
-            private _smoothing = 0.9;
+            private _times: number[] = [];
 
             private _maxDeltaMs = 250;
-        
-            tick(): number {
-                const now = performance.now();
+
+            tick(fps: number = 0): number {
+                let now = performance.now();
                 this._rawDelta = now - this._last;
+                this._delta = this._rawDelta;
 
-                this._delta = Math.min(this._rawDelta, this._maxDeltaMs);
+                if (fps > 0) {
+                    const target = 1000 / fps;
+                    const delay = target - this._delta;
+                    if (delay > 0) {
+                        const start = performance.now();
+                        while (performance.now() - start < delay) {}
+                    }
+                    now = performance.now();
+                    this._delta = now - this._last;
+                    this._rawDelta = this._delta;
+                }
 
-                const instFps = 1000 / (this._delta || 1);
-                this._fps = this._fps
-                ? this._smoothing * this._fps + (1 - this._smoothing) * instFps
-                : instFps;
+                this._delta = Math.min(this._delta, this._maxDeltaMs);
+
+                this._times.push(this._delta);
+                if (this._times.length > 10) {
+                    this._times.shift();
+                }
 
                 this._last = now;
                 return this._delta;
@@ -1007,7 +1019,9 @@ export namespace BlitJS {
             }
 
             getFPS(): number {
-                return this._fps;
+                if (this._times.length === 0) return 0;
+                const avg = this._times.reduce((a, b) => a + b, 0) / this._times.length;
+                return 1000 / avg;
             }
         }
     }
