@@ -11,6 +11,8 @@ blueBox.fill('blue');
 const playerSurf = await BlitJS.image.load("./images/player.png");
 const playerRect = playerSurf.getRect([200, 100]);
 
+const testFont = new BlitJS.font.Font("MedodicaRegular", 128);
+
 let movement = [false, false];
 let flip: boolean = false;
 
@@ -57,13 +59,16 @@ const loop = () => {
     BlitJS.draw.arc(display, [100, 100], 50, 0, Math.PI, { r: 255, g: 0, b: 0, a: 1 }, 2);
     BlitJS.draw.ellipse(display, [200, 200], [80, 40], 0, 0, 2 * Math.PI, { r: 0, g: 255, b: 0, a: 1 }, 3);
     BlitJS.draw.fillEllipse(display, [150, 150],[ 60, 30], 0, 0, 2 * Math.PI, { r: 0, g: 0, b: 255, a: 1 });
+
+    let textSurf = testFont.render("Hello, World!");
     
     display.blit(blueBox, blueBoxRect.pos);
     display.blit(BlitJS.transform.flip(playerSurf, [flip, false]), playerRect.pos);
     
     screen.blit(BlitJS.transform.scale(display, BlitJS.display.getSize()), [0, 0]);
-    
     //screen.blit(display, [0, 0]);
+    
+    screen.blit(textSurf, [200, 200]);
 
     screen.update();
 

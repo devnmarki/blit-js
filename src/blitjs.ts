@@ -272,6 +272,43 @@ export namespace BlitJS {
         };
     }
 
+    export namespace font {
+
+        export class Font {
+            private font: string;
+
+            constructor(font: string | null, size: number) {
+                this.font = `${size}px ${font ?? "Arial"}`;
+            }
+
+            render(text: string, color: Color = { r: 255, g: 255, b: 255, a: 1 }) : Surface {
+                const tempCanvas = document.createElement("canvas");
+                const tempCtx = tempCanvas.getContext("2d") as CanvasRenderingContext2D;
+                tempCtx.font = this.font;
+
+                const metrics = tempCtx.measureText(text);
+                const width = Math.ceil(metrics.width);
+
+                // fallback height: use font size (parsed from this.font string)
+                const fontSizeMatch = this.font.match(/(\d+)px/);
+                const fontSize = fontSizeMatch ? parseInt(fontSizeMatch[1], 10) : 16;
+                const height = fontSize * 1.3; // add padding so descenders (y, g, p) don't cut off
+
+                // create surface
+                const surf = new Surface([width, height]);
+
+                surf.ctx.imageSmoothingEnabled = true;
+                surf.ctx.font = this.font;
+                surf.ctx.fillStyle = `rgba(${color.r ?? 0}, ${color.g ?? 0}, ${color.b ?? 0}, ${color.a ?? 1})`;
+                surf.ctx.textBaseline = "alphabetic"; // safer than "top"
+                surf.ctx.fillText(text, 0, fontSize); // y offset = font size so baseline aligns
+
+                return surf;
+            }
+        }
+
+    }
+
     export namespace display {
 
         class Display
